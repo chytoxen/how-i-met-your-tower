@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "url": "https://github.com/chytoxen/how-i-met-your-tower/releases/latest",
-  "notes": "First public release — solo + co-op aviation emergency."
+  "notes": "Fixes co-op black-screen + empty photo banners + menu layout + F1 back; overhauls movement, visuals (real textures, lighting, characters) and audio (real music)."
 }

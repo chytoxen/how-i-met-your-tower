@@ -1,0 +1,36 @@
+HOW I MET YOUR TOWER — How to play
+==================================
+
+You're the flight crew of an airliner that's falling apart. Fix the failing
+systems, REACH THE TOWER (Air Traffic Control), and get talked down to a landing
+before the clock — or the plane — runs out. Every flight is different.
+
+INSTALL
+- Double-click HowIMetYourTower.exe. That's it (it's self-contained). Windows
+  may warn about an unknown publisher — click "More info" > "Run anyway".
+
+CONTROLS
+- WASD move · Shift sprint · Ctrl crouch · Space jump · Mouse look
+- E interact (hold the look at a console and press E to work a task)
+- C emote · V push-to-talk (voice) · B walkie-talkie · Esc pause
+- Rebind everything in Settings > Controls.
+
+SOLO
+- Main menu > PLAY (SOLO) > walk to the glowing DEPARTURES desk > press E to board.
+
+WITH FRIENDS (up to 4)
+- One of you: MULTIPLAYER > HOST A FLIGHT. Tell the others your IP.
+  (Same WiFi works out of the box; over the internet the host forwards UDP port
+   24565, or use a tool like Hamachi/ZeroTier.)
+- Everyone else: MULTIPLAYER > type the host's IP > JOIN.
+- In the lobby: walk around, then READY UP. The host hits START FLIGHT.
+
+THE FLIGHT
+- A checklist of failures appears (top-left). Run to each console and press E
+  repeatedly to work its steps. Split up — you can't be everywhere at once.
+- FIX THE RADIO FIRST ("MEET THE TOWER") — that unlocks ATC guiding you down.
+- Unfixed failures wreck your controls, drag, and hull integrity. Decompression
+  and fires will eventually bring you down if ignored.
+- Land inside the envelope (speed / descent / wings level / aligned) before T-0.
+
+Good luck. Reach the Tower. Land alive.

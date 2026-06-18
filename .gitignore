@@ -1,0 +1,20 @@
+# Godot 4 — import cache is regenerated on open
+.godot/
+
+# build output
+/builds/
+/export/*.exe
+/export/*.pck
+/export/*.zip
+
+# personal photos — they bake into the built game, but stay out of the (public) source repo
+assets/banners/*.jpg
+assets/banners/*.jpeg
+assets/banners/*.png
+assets/banners/*.webp
+assets/banners/*.import
+
+# OS cruft
+.DS_Store
+Thumbs.db
+*.tmp

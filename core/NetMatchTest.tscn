@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/net_matchtest.gd" id="1_nmt"]
+
+[node name="NetMatchTest" type="Node"]
+script = ExtResource("1_nmt")

@@ -12,7 +12,7 @@ extends Node
 signal update_available(version: String, url: String, notes: String)
 
 const CURRENT_VERSION := "0.2.0"
-const MANIFEST_URL := ""   # e.g. "https://raw.githubusercontent.com/<you>/<repo>/main/version.json"
+const MANIFEST_URL := "https://raw.githubusercontent.com/chytoxen/how-i-met-your-tower/main/version.json"
 
 var has_update := false
 var update_version := ""
@@ -24,11 +24,13 @@ func _ready() -> void:
 		return
 	check()
 
-func check() -> void:
+func check(url := MANIFEST_URL) -> void:
+	if url == "":
+		return
 	var http := HTTPRequest.new()
 	add_child(http)
 	http.request_completed.connect(_on_done.bind(http))
-	if http.request(MANIFEST_URL) != OK:
+	if http.request(url) != OK:
 		http.queue_free()
 
 func _on_done(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray, http: HTTPRequest) -> void:

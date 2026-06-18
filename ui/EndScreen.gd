@@ -16,10 +16,12 @@ func _build() -> void:
 	add_child(bg)
 
 	var v := VBoxContainer.new()
-	v.set_anchors_preset(Control.PRESET_CENTER)
 	v.alignment = BoxContainer.ALIGNMENT_CENTER
 	v.add_theme_constant_override("separation", 12)
-	add_child(v)
+	var cc := CenterContainer.new()
+	cc.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(cc)
+	cc.add_child(v)
 
 	var sabotage: bool = r.get("mode", "coop") == "saboteur"
 	var title := Label.new()

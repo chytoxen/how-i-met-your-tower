@@ -3,12 +3,21 @@ extends CharacterBody3D
 ## small HUD (crosshair + context prompt) are built in code so it works anywhere
 ## (lobby and aircraft) with no external wiring.
 
-@export var walk_speed := 4.5
-@export var sprint_speed := 7.5
-@export var crouch_speed := 2.5
-@export var jump_velocity := 5.0
+@export var walk_speed := 5.2
+@export var sprint_speed := 8.6
+@export var crouch_speed := 2.8
+@export var jump_velocity := 5.2
 @export var mouse_sensitivity := 0.0025
-@export var accel := 60.0
+@export var ground_accel := 65.0
+@export var air_accel := 16.0
+@export var friction := 80.0
+@export var sprint_fov_add := 8.0
+
+const COYOTE_TIME := 0.12     # jump shortly after leaving a ledge
+const JUMP_BUFFER := 0.12     # jump pressed shortly before landing
+const STAND_HEIGHT := 1.65
+const CROUCH_HEIGHT := 1.15
+const EMOTES: Array[String] = ["o7", "GG!", "HELP!", "NICE!", "BRACE!"]
 
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 var _head: Node3D
@@ -16,9 +25,13 @@ var _camera: Camera3D
 var _interact_ray: RayCast3D
 var _prompt: Label
 var _target: Node = null
-
-const EMOTES: Array[String] = ["o7", "GG!", "HELP!", "NICE!", "BRACE!"]
 var _emote_idx := 0
+
+var _coyote := 0.0
+var _jump_buf := 0.0
+var _base_fov := 85.0
+var _bob_t := 0.0
+var _step_t := 0.0
 
 func _ready() -> void:
 	_build_body()
@@ -37,12 +50,12 @@ func _build_body() -> void:
 
 	_head = Node3D.new()
 	_head.name = "Head"
-	_head.position = Vector3(0, 1.65, 0)
+	_head.position = Vector3(0, STAND_HEIGHT, 0)
 	add_child(_head)
 
 	_camera = Camera3D.new()
 	_camera.current = true
-	_camera.fov = 85.0
+	_camera.fov = _base_fov
 	_head.add_child(_camera)
 
 	_interact_ray = RayCast3D.new()
@@ -85,25 +98,70 @@ func _unhandled_input(event: InputEvent) -> void:
 		_target.interact(self)
 
 func _physics_process(delta: float) -> void:
-	if not is_on_floor():
-		velocity.y -= _gravity * delta
-	if Input.is_action_just_pressed("jump") and is_on_floor():
-		velocity.y = jump_velocity
+	var grounded := is_on_floor()
 
-	var speed := walk_speed
-	if Input.is_action_pressed("crouch"):
-		speed = crouch_speed
-	elif Input.is_action_pressed("sprint"):
-		speed = sprint_speed
+	if grounded:
+		_coyote = COYOTE_TIME
+	else:
+		velocity.y -= _gravity * delta
+		_coyote -= delta
+
+	if Input.is_action_just_pressed("jump"):
+		_jump_buf = JUMP_BUFFER
+	else:
+		_jump_buf -= delta
+	if _jump_buf > 0.0 and _coyote > 0.0:
+		velocity.y = jump_velocity
+		_jump_buf = 0.0
+		_coyote = 0.0
+
+	var crouching := Input.is_action_pressed("crouch")
+	var sprinting := Input.is_action_pressed("sprint") and not crouching
+	var speed := crouch_speed if crouching else (sprint_speed if sprinting else walk_speed)
 
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	var dir := (transform.basis * Vector3(input_dir.x, 0.0, input_dir.y)).normalized()
-	var target := dir * speed
-	velocity.x = move_toward(velocity.x, target.x, accel * delta)
-	velocity.z = move_toward(velocity.z, target.z, accel * delta)
-	move_and_slide()
+	var wish := transform.basis * Vector3(input_dir.x, 0.0, input_dir.y)
+	wish.y = 0.0
+	wish = wish.normalized() * speed
 
+	var a := ground_accel if grounded else air_accel
+	if input_dir.length() > 0.01:
+		velocity.x = move_toward(velocity.x, wish.x, a * delta)
+		velocity.z = move_toward(velocity.z, wish.z, a * delta)
+	else:
+		var f := friction if grounded else air_accel
+		velocity.x = move_toward(velocity.x, 0.0, f * delta)
+		velocity.z = move_toward(velocity.z, 0.0, f * delta)
+
+	move_and_slide()
+	_update_view(delta, sprinting, crouching)
 	_update_interaction()
+
+func _update_view(delta: float, sprinting: bool, crouching: bool) -> void:
+	if _camera == null or _head == null:
+		return
+	var spd := Vector2(velocity.x, velocity.z).length()
+
+	# crouch lowers the head
+	var target_h := CROUCH_HEIGHT if crouching else STAND_HEIGHT
+	_head.position.y = lerpf(_head.position.y, target_h, clampf(delta * 10.0, 0.0, 1.0))
+
+	# sprint FOV kick
+	var target_fov := _base_fov + (sprint_fov_add if sprinting and spd > 1.0 else 0.0)
+	_camera.fov = lerpf(_camera.fov, target_fov, clampf(delta * 8.0, 0.0, 1.0))
+
+	# head bob + footsteps
+	if is_on_floor() and spd > 0.6:
+		_bob_t += delta * spd * 1.6
+		_camera.position.y = sin(_bob_t * 2.0) * 0.035
+		_camera.position.x = sin(_bob_t) * 0.022
+		_step_t -= delta * spd
+		if _step_t <= 0.0:
+			_step_t = 4.2
+			Audio.play("step", -8.0, randf_range(0.9, 1.1))
+	else:
+		_camera.position.y = lerpf(_camera.position.y, 0.0, clampf(delta * 10.0, 0.0, 1.0))
+		_camera.position.x = lerpf(_camera.position.x, 0.0, clampf(delta * 10.0, 0.0, 1.0))
 
 func _update_interaction() -> void:
 	if _interact_ray == null:

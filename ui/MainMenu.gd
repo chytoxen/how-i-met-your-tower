@@ -36,10 +36,12 @@ func _build_ui() -> void:
 	add_child(bg)
 
 	var center := VBoxContainer.new()
-	center.set_anchors_preset(Control.PRESET_CENTER)
 	center.alignment = BoxContainer.ALIGNMENT_CENTER
 	center.add_theme_constant_override("separation", 12)
-	add_child(center)
+	var cc := CenterContainer.new()
+	cc.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(cc)
+	cc.add_child(center)
 
 	var title := Label.new()
 	title.text = "HOW I MET YOUR TOWER"

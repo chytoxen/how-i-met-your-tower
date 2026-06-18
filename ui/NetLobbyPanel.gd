@@ -10,7 +10,13 @@ var _is_ready := false
 
 func _ready() -> void:
 	var panel := PanelContainer.new()
-	panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, 16)
+	panel.anchor_left = 1.0
+	panel.anchor_right = 1.0
+	panel.offset_left = -300
+	panel.offset_top = 16
+	panel.offset_right = -16
+	panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	panel.grow_vertical = Control.GROW_DIRECTION_END
 	add_child(panel)
 
 	var v := VBoxContainer.new()

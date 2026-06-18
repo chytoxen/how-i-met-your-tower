@@ -89,20 +89,21 @@ func _build_environment() -> void:
 	add_child(sun)
 
 func _build_fuselage() -> void:
-	var hull := Color(0.80, 0.81, 0.84)
-	var floor_col := Color(0.25, 0.26, 0.3)
+	var hull_mat := Mats.textured("metal", 4.0, 0.4, Color(0.82, 0.84, 0.88))
 
-	# floor + ceiling (floor collides so you can walk)
-	_solid_box(Vector3(5.0, 0.3, 34.0), Vector3(0, -0.15, 9.0), floor_col)
-	_mesh_box(Vector3(5.0, 0.2, 34.0), Vector3(0, 2.7, 9.0), hull)
-	# tail + nose-back walls
-	_solid_box(Vector3(5.0, 3.0, 0.3), Vector3(0, 1.4, 26.0), hull)
+	# floor (carpet aisle) + ceiling (brushed hull)
+	var fl := _solid_box(Vector3(5.0, 0.3, 34.0), Vector3(0, -0.15, 9.0), Color.WHITE)
+	(fl.get_child(0) as MeshInstance3D).material_override = Mats.textured("carpet", 8.0, 0.0, Color(0.28, 0.31, 0.4))
+	_mesh_box(Vector3(5.0, 0.2, 34.0), Vector3(0, 2.7, 9.0), Color.WHITE).material_override = hull_mat
+	# tail wall
+	var tw := _solid_box(Vector3(5.0, 3.0, 0.3), Vector3(0, 1.4, 26.0), Color.WHITE)
+	(tw.get_child(0) as MeshInstance3D).material_override = hull_mat
 	# side collision walls (full height; visuals added separately with a window band)
 	_collide_wall(Vector3(0.3, 3.0, 34.0), Vector3(-2.5, 1.4, 9.0))
 	_collide_wall(Vector3(0.3, 3.0, 34.0), Vector3(2.5, 1.4, 9.0))
 	for sx in [-2.45, 2.45]:
-		_mesh_box(Vector3(0.15, 1.0, 34.0), Vector3(sx, 0.5, 9.0), hull)        # below windows
-		_mesh_box(Vector3(0.15, 0.9, 34.0), Vector3(sx, 2.25, 9.0), hull)       # above windows
+		_mesh_box(Vector3(0.15, 1.0, 34.0), Vector3(sx, 0.5, 9.0), Color.WHITE).material_override = hull_mat
+		_mesh_box(Vector3(0.15, 0.9, 34.0), Vector3(sx, 2.25, 9.0), Color.WHITE).material_override = hull_mat
 		_glass(Vector3(0.08, 0.7, 34.0), Vector3(sx, 1.45, 9.0))               # window strip
 
 	# cockpit: instrument coaming + windshield up front (-Z nose)
@@ -462,7 +463,7 @@ func _mesh_box(size: Vector3, pos: Vector3, color: Color) -> MeshInstance3D:
 	add_child(mi)
 	return mi
 
-func _solid_box(size: Vector3, pos: Vector3, color: Color) -> void:
+func _solid_box(size: Vector3, pos: Vector3, color: Color) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	var mi := MeshInstance3D.new()
 	var mesh := BoxMesh.new()
@@ -479,6 +480,7 @@ func _solid_box(size: Vector3, pos: Vector3, color: Color) -> void:
 	body.add_child(cs)
 	body.position = pos
 	add_child(body)
+	return body
 
 func _collide_wall(size: Vector3, pos: Vector3) -> void:
 	var body := StaticBody3D.new()

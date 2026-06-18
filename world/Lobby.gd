@@ -76,43 +76,68 @@ func _build_environment() -> void:
 # --- terminal geometry -------------------------------------------------------
 
 func _build_terminal() -> void:
-	var wall := Color(0.78, 0.79, 0.82)
-	var floor_col := Color(0.32, 0.34, 0.38)
-	var dark := Color(0.18, 0.19, 0.22)
+	# Shell — real CC0 textures
+	_textured(_box(Vector3(40, 0.5, 40), Vector3(0, -0.25, 0), Color.WHITE), Mats.textured("floor", 9.0))
+	_textured(_box(Vector3(40, 0.4, 40), Vector3(0, 8.0, 0), Color.WHITE), Mats.flat(Color(0.10, 0.11, 0.14), 0.9))
+	var wall_mat := Mats.textured("wall", 5.0, 0.0, Color(0.82, 0.84, 0.88))
+	_textured(_box(Vector3(40, 8, 0.5), Vector3(0, 4, -20), Color.WHITE), wall_mat)
+	_textured(_box(Vector3(0.5, 8, 40), Vector3(-20, 4, 0), Color.WHITE), wall_mat)
+	_textured(_box(Vector3(0.5, 8, 40), Vector3(20, 4, 0), Color.WHITE), wall_mat)
 
-	_box(Vector3(40, 0.5, 40), Vector3(0, -0.25, 0), floor_col)        # floor
-	_box(Vector3(40, 0.4, 40), Vector3(0, 8.0, 0), wall)              # ceiling
-	_box(Vector3(40, 8, 0.5), Vector3(0, 4, -20), wall)              # back wall
-	_box(Vector3(0.5, 8, 40), Vector3(-20, 4, 0), wall)             # left wall
-	_box(Vector3(0.5, 8, 40), Vector3(20, 4, 0), wall)              # right wall
-
-	# Front glass facade (toward the apron/tower), semi-transparent
-	var glass := _box(Vector3(40, 8, 0.3), Vector3(0, 4, 20), Color(0.5, 0.7, 0.85, 0.18))
+	# Front glass facade (toward the apron/tower)
+	var glass := _box(Vector3(40, 8, 0.3), Vector3(0, 4, 20), Color.WHITE)
 	var gmat := StandardMaterial3D.new()
-	gmat.albedo_color = Color(0.5, 0.7, 0.85, 0.18)
+	gmat.albedo_color = Color(0.4, 0.6, 0.8, 0.14)
 	gmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	gmat.metallic = 0.4
+	gmat.metallic = 0.6
 	gmat.roughness = 0.05
 	(glass.get_child(0) as MeshInstance3D).material_override = gmat
 
-	# Pillars
+	# Pillars — brushed metal
+	var pillar_mat := Mats.textured("metal", 2.0, 0.85, Color(0.58, 0.6, 0.66))
 	for x in [-12, -4, 4, 12]:
 		for z in [-12, 0, 12]:
-			_box(Vector3(1, 8, 1), Vector3(x, 4, z), dark)
+			_textured(_box(Vector3(1, 8, 1), Vector3(x, 4, z), Color.WHITE), pillar_mat)
 
-	# Seating clusters (gate waiting area)
+	# Gate-area carpet
+	_textured(_box(Vector3(38, 0.06, 16), Vector3(0, 0.04, -4), Color.WHITE), Mats.textured("carpet", 6.0, 0.0, Color(0.55, 0.32, 0.36)))
+
+	# Seating clusters
+	var seat_mat := Mats.flat(Color(0.16, 0.2, 0.34), 0.5)
 	for cx in [-10, 2, 12]:
 		for row in range(3):
-			_box(Vector3(4, 0.5, 0.8), Vector3(cx, 0.5, -6 + row * 2.0), Color(0.2, 0.35, 0.55))
-			_box(Vector3(4, 0.8, 0.2), Vector3(cx, 1.0, -6 + row * 2.0 - 0.4), Color(0.2, 0.35, 0.55))
+			_textured(_box(Vector3(4, 0.5, 0.8), Vector3(cx, 0.5, -6 + row * 2.0), Color.WHITE), seat_mat)
+			_textured(_box(Vector3(4, 0.8, 0.2), Vector3(cx, 1.0, -6 + row * 2.0 - 0.4), Color.WHITE), seat_mat)
 
-	# Check-in / gate desks along the back
+	# Check-in / gate desks — metal
+	var desk_mat := Mats.textured("metal", 1.5, 0.7, Color(0.5, 0.52, 0.58))
 	for dx in [-14, -7, 0, 7, 14]:
-		_box(Vector3(3, 1.1, 1.2), Vector3(dx, 0.55, -17), Color(0.45, 0.3, 0.2))
+		_textured(_box(Vector3(3, 1.1, 1.2), Vector3(dx, 0.55, -17), Color.WHITE), desk_mat)
 
-	# A few "ground crew can practice flying" pads hint — small flyable-plane stubs (Phase 3)
-	_box(Vector3(2, 0.1, 2), Vector3(-16, 0.05, 16), Color(0.9, 0.75, 0.1))
-	_box(Vector3(2, 0.1, 2), Vector3(16, 0.05, 16), Color(0.9, 0.75, 0.1))
+	# Flyable-plane pads
+	for px in [-16, 16]:
+		_textured(_box(Vector3(2, 0.1, 2), Vector3(px, 0.05, 16), Color.WHITE), Mats.flat(Color(0.9, 0.75, 0.1), 0.4))
+
+	# Warm interior ceiling lights + glowing fixtures (the missing piece — was flat)
+	for x in [-12, 0, 12]:
+		for z in [-12, 0, 12]:
+			var lamp := OmniLight3D.new()
+			lamp.position = Vector3(x, 7.0, z)
+			lamp.light_color = Color(1.0, 0.95, 0.86)
+			lamp.light_energy = 2.0
+			lamp.omni_range = 15.0
+			add_child(lamp)
+			var fix := _box(Vector3(2.4, 0.15, 2.4), Vector3(x, 7.75, z), Color.WHITE)
+			var em := StandardMaterial3D.new()
+			em.albedo_color = Color(1, 0.97, 0.9)
+			em.emission_enabled = true
+			em.emission = Color(1, 0.95, 0.85)
+			em.emission_energy_multiplier = 2.5
+			(fix.get_child(0) as MeshInstance3D).material_override = em
+
+func _textured(body: StaticBody3D, mat: Material) -> StaticBody3D:
+	(body.get_child(0) as MeshInstance3D).material_override = mat
+	return body
 
 func _build_tower_outside() -> void:
 	# Ground apron beyond the glass
@@ -179,4 +204,7 @@ func _build_hud() -> void:
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.keycode == KEY_F1:
+		if Net.active:
+			Net.leave()
+		get_tree().paused = false
 		GameState.goto_scene("res://ui/MainMenu.tscn")

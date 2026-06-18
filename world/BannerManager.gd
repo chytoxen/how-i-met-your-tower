@@ -1,16 +1,19 @@
 class_name BannerManager
 extends Node
 ## Easter egg: hangs the squad's photos as framed, spotlit banners around the
-## terminal. Scans res://assets/banners and user://banners for images and places
-## them at the given wall anchors. Drop your photos in either folder and they
-## auto-populate (cycled if there are more anchors than photos). Falls back to
-## tinted placeholders so the walls are never empty.
+## terminal. Bundled photos must be named banner1.jpg, banner2.jpg, ... (loaded by
+## EXPLICIT path — res:// directory scanning does NOT work in exported builds, which
+## is why the frames were empty in the shipped game). Players can also drop images
+## into a `banners/` folder next to the .exe at runtime. Falls back to tinted
+## placeholders so the walls are never empty.
 
-const DIRS := ["res://assets/banners", "user://banners"]
 const EXTS := ["png", "jpg", "jpeg", "webp"]
+const MAX_BANNERS := 32
 
 func populate(parent: Node3D, anchors: Array) -> void:
 	var textures := _load_textures()
+	if OS.get_environment("CREW_DEBUG") != "":
+		print("[banners] loaded %d image(s)" % textures.size())
 	for i in anchors.size():
 		var tex: Texture2D
 		if textures.size() > 0:
@@ -21,15 +24,23 @@ func populate(parent: Node3D, anchors: Array) -> void:
 
 func _load_textures() -> Array:
 	var out := []
-	for d in DIRS:
-		var dir := DirAccess.open(d)
-		if dir == null:
-			continue
+	# Bundled banners: load by explicit path so it works in exported builds.
+	for i in range(1, MAX_BANNERS + 1):
+		for ext in EXTS:
+			var path := "res://assets/banners/banner%d.%s" % [i, ext]
+			if ResourceLoader.exists(path):
+				var r = load(path)
+				if r is Texture2D:
+					out.append(r)
+				break
+	# Runtime banners dropped next to the .exe (real filesystem; scanning is fine).
+	var dir := DirAccess.open("user://banners")
+	if dir != null:
 		dir.list_dir_begin()
 		var f := dir.get_next()
 		while f != "":
 			if not dir.current_is_dir() and f.get_extension().to_lower() in EXTS:
-				var t := _load_image_texture(d + "/" + f)
+				var t := _load_image_texture("user://banners/" + f)
 				if t != null:
 					out.append(t)
 			f = dir.get_next()

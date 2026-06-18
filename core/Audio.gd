@@ -23,6 +23,7 @@ func _ready() -> void:
 	_cache["whoosh"] = _whoosh()
 	_cache["explosion"] = _explosion()
 	_cache["touchdown"] = _touchdown()
+	_cache["step"] = _step()
 
 # --- public API --------------------------------------------------------------
 
@@ -64,7 +65,7 @@ func play_3d(sound: String, parent: Node3D, volume_db := 0.0) -> void:
 func start_music(kind := "menu") -> void:
 	stop_music()
 	_music_player = AudioStreamPlayer.new()
-	_music_player.stream = _music(kind)
+	_music_player.stream = _music_stream(kind)
 	_music_player.bus = "Music"
 	add_child(_music_player)
 	_music_player.play()
@@ -199,6 +200,37 @@ func _touchdown() -> AudioStreamWAV:
 		var white := randf() * 2.0 - 1.0
 		a[i] = (white * 0.5 + sin(TAU * 90.0 * t) * 0.5) * env
 	return _make_wav(a)
+
+func _step() -> AudioStreamWAV:
+	var dur := 0.08
+	var n := int(dur * RATE)
+	var a := PackedFloat32Array()
+	a.resize(n)
+	var last := 0.0
+	for i in n:
+		var t := float(i) / RATE
+		var env := exp(-28.0 * t)
+		var white := randf() * 2.0 - 1.0
+		last = last * 0.7 + white * 0.3
+		a[i] = (last * 0.6 + sin(TAU * 110.0 * t) * 0.4) * env * 0.7
+	return _make_wav(a)
+
+## Prefer a real CC0 track from assets/audio/music/<kind>.(mp3|ogg); fall back to
+## the synthesized loop if none is bundled.
+func _music_stream(kind: String) -> AudioStream:
+	for ext in ["mp3", "ogg", "wav"]:
+		var path := "res://assets/audio/music/%s.%s" % [kind, ext]
+		if ResourceLoader.exists(path):
+			var s: Variant = load(path)
+			if s is AudioStreamMP3:
+				s.loop = true
+				return s
+			if s is AudioStreamOggVorbis:
+				s.loop = true
+				return s
+			if s is AudioStream:
+				return s
+	return _music(kind)
 
 func _music(kind: String) -> AudioStreamWAV:
 	# A slow, looping pad/arpeggio. Tense minor for the flight, calmer for menu.

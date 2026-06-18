@@ -1,9 +1,18 @@
 # Roadmap
 
-Status as of **v0.2.0**. The whole core loop — solo and co-op — is built and
-verified (compiles, every scene boots, logic self-tests pass, networking proven
-across two processes, Windows `.exe` builds). Remaining items are polish, content,
-and the things that genuinely need real-hardware playtesting.
+Status as of **v0.3.0**.
+
+## v0.3.0 — bug fixes + visual/audio overhaul
+- [x] **FIXED: client black screen / can't move in co-op** — clients now always spawn
+      their own player (was depending on the roster, which hadn't synced yet). Verified with a 2-process lobby test.
+- [x] **FIXED: empty photo banners** — load by explicit path (res:// dir scanning fails in
+      exported builds). Verified inside a real packed build (5 photos load).
+- [x] **FIXED: F1 in a server now leaves cleanly** (disconnects + returns to menu).
+- [x] **FIXED: menus centered** (CenterContainer) and **roster panel back on-screen** (explicit anchors).
+- [x] **Movement overhaul**: acceleration/friction, air control, coyote-time + jump-buffer, head-bob, sprint FOV, footsteps.
+- [x] **Real CC0 textures** (ambientCG): tiled floor, carpet, concrete walls, metal — + warm interior lighting.
+- [x] **Blocky crew characters** (suit/hi-vis/skin) replacing the capsules.
+- [x] **Real CC0 music** (OpenGameArt) for menu + flight, with synth fallback.
 
 ## ✅ Done
 

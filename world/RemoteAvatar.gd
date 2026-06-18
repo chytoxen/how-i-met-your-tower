@@ -9,27 +9,25 @@ var _target_yaw: float
 var _has_target := false
 
 func setup(callsign: String, color: Color) -> void:
-	var body := MeshInstance3D.new()
-	var cap := CapsuleMesh.new()
-	cap.radius = 0.32
-	cap.height = 1.7
-	body.mesh = cap
-	body.position.y = 0.9
-	var m := StandardMaterial3D.new()
-	m.albedo_color = color
-	body.material_override = m
-	add_child(body)
+	var suit := StandardMaterial3D.new()
+	suit.albedo_color = color
+	suit.roughness = 0.55
+	var skin := StandardMaterial3D.new()
+	skin.albedo_color = Color(0.8, 0.65, 0.54)
+	var dark := StandardMaterial3D.new()
+	dark.albedo_color = Color(0.14, 0.15, 0.19)
+	var hi := StandardMaterial3D.new()
+	hi.albedo_color = Color(0.95, 0.85, 0.2)
+	hi.emission_enabled = true
+	hi.emission = Color(0.55, 0.48, 0.1)
 
-	var head := MeshInstance3D.new()
-	var sm := SphereMesh.new()
-	sm.radius = 0.18
-	sm.height = 0.36
-	head.mesh = sm
-	head.position.y = 1.75
-	var hm := StandardMaterial3D.new()
-	hm.albedo_color = Color(0.8, 0.66, 0.55)
-	head.material_override = hm
-	add_child(head)
+	_part(Vector3(0.52, 0.64, 0.32), Vector3(0, 1.15, 0), suit)       # torso
+	_part(Vector3(0.54, 0.12, 0.34), Vector3(0, 0.92, 0), hi)         # hi-vis belt
+	_part(Vector3(0.36, 0.36, 0.36), Vector3(0, 1.64, 0), skin)       # head
+	_part(Vector3(0.14, 0.52, 0.14), Vector3(-0.34, 1.12, 0), suit)   # left arm
+	_part(Vector3(0.14, 0.52, 0.14), Vector3(0.34, 1.12, 0), suit)    # right arm
+	_part(Vector3(0.19, 0.58, 0.19), Vector3(-0.13, 0.5, 0), dark)    # left leg
+	_part(Vector3(0.19, 0.58, 0.19), Vector3(0.13, 0.5, 0), dark)     # right leg
 
 	var tag := Label3D.new()
 	tag.text = callsign
@@ -37,10 +35,19 @@ func setup(callsign: String, color: Color) -> void:
 	tag.no_depth_test = true
 	tag.font_size = 40
 	tag.pixel_size = 0.003
-	tag.position.y = 2.15
+	tag.position.y = 2.2
 	tag.modulate = color.lightened(0.4)
 	tag.outline_size = 8
 	add_child(tag)
+
+func _part(size: Vector3, pos: Vector3, mat: Material) -> void:
+	var mi := MeshInstance3D.new()
+	var bm := BoxMesh.new()
+	bm.size = size
+	mi.mesh = bm
+	mi.material_override = mat
+	mi.position = pos
+	add_child(mi)
 
 func set_target(pos: Vector3, yaw: float) -> void:
 	_target_pos = pos

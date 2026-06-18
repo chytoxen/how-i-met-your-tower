@@ -17,32 +17,32 @@ var _send_accum := 0.0
 func build(points: Array) -> void:
 	if points.size() > 0:
 		_spawn_points = points
+	# ALWAYS spawn the local player immediately. Clients enter the lobby the moment
+	# they connect — BEFORE the roster syncs — so we must never depend on Net.players
+	# already containing our own id. (That was the black-screen / can't-move bug.)
+	_spawn_local(_point_for(Net.local_id()))
 	if not Net.active:
-		_spawn_local(_point(0))
 		return
 	Net.roster_changed.connect(_on_roster)
-	var ids := Net.players.keys()
-	ids.sort()
-	for i in ids.size():
-		var id: int = ids[i]
-		if id == Net.local_id():
-			_spawn_local(_point(i))
-		else:
-			_spawn_remote(id, _point(i))
+	for id in Net.players.keys():
+		if id != Net.local_id():
+			_spawn_remote(id, _point_for(id))
 
 	var voice := Voice.new()
 	voice.name = "Voice"
 	add_child(voice)
 	voice.setup(self)
 
-func _point(i: int) -> Vector3:
-	return _spawn_points[i % _spawn_points.size()]
+func _point_for(id: int) -> Vector3:
+	return _spawn_points[absi(id) % _spawn_points.size()]
 
 func _spawn_local(pos: Vector3) -> void:
 	local_player = preload("res://player/Player.tscn").instantiate()
 	local_player.position = pos
 	add_child(local_player)
 	local_spawned.emit(local_player)
+	if OS.get_environment("CREW_DEBUG") != "":
+		print("[crew] local player spawned id=%d at %s" % [Net.local_id(), str(pos)])
 
 func _spawn_remote(id: int, pos: Vector3) -> void:
 	var av := RemoteAvatar.new()
@@ -56,7 +56,7 @@ func _on_roster() -> void:
 	# lobby late join / leave
 	for id in Net.players.keys():
 		if id != Net.local_id() and not avatars.has(id):
-			_spawn_remote(id, _point(avatars.size() + 1))
+			_spawn_remote(id, _point_for(id))
 	for id in avatars.keys():
 		if not Net.players.has(id):
 			avatars[id].queue_free()

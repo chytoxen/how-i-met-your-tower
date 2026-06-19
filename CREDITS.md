@@ -1,6 +1,6 @@
 # Credits
 
-All third-party assets are CC0 / public-domain or OFL (free for commercial use).
+All third-party assets are CC0 / public-domain, OFL, or generated; free for this use.
 
 ## Fonts — SIL Open Font License 1.1
 - **Orbitron** by Matt McInerney — https://fonts.google.com/specimen/Orbitron (titles)
@@ -10,16 +10,21 @@ All third-party assets are CC0 / public-domain or OFL (free for commercial use).
 - Menu / ambient: **"waiting40"** — https://opengameart.org/content/waiting40
 - Flight / tension: **"It Lies Ahead"** — https://opengameart.org/content/it-lies-ahead
 
+## Voice + sound effects — generated with ElevenLabs
+- The **ATC "Tower" voice** (contact / approach / brace / landing lines) and the **alarm**
+  and **explosion** SFX were generated with ElevenLabs (voice: "Daniel - Steady Broadcaster").
+  Used under the ElevenLabs free plan (attribution to ElevenLabs as required).
+- All other SFX (beeps, engine, footsteps, etc.) are synthesized in code (`core/Audio.gd`).
+
+## 3D models — CC0 (PolyHaven.com)
+- **ArmChair_01** (terminal lounge seating), **potted_plant_04** (greenery) — https://polyhaven.com
+
 ## Textures — CC0 (ambientCG.com)
 - **Tiles074** (terminal floor), **Concrete034** (walls), **MetalPlates006** (pillars / hull),
   **Carpet013** (gate carpet / cabin) — https://ambientcg.com
 
-## Sound effects
-- All SFX (alarms, beeps, engine, footsteps, explosion, etc.) are **synthesized in code**
-  (`core/Audio.gd`) — no third-party files.
-
 ## Art
-- 3D scenes are built from primitives with original materials/lighting + the CC0 textures above.
+- Remaining 3D scenes are built from primitives with original materials/lighting + the CC0 assets above.
 - Lobby banner images are personal photos supplied by the project owner (kept out of the public source).
 
 ## Engine

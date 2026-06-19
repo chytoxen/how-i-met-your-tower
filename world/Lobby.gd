@@ -5,6 +5,9 @@ extends Node3D
 ## Outside the glass stands the control TOWER — the thing the whole game is
 ## about reaching.
 
+const ARMCHAIR := preload("res://assets/models/armchair/ArmChair_01_1k.gltf")
+const PLANT := preload("res://assets/models/plant/potted_plant_04_1k.gltf")
+
 func _ready() -> void:
 	_build_environment()
 	_build_terminal()
@@ -102,12 +105,15 @@ func _build_terminal() -> void:
 	# Gate-area carpet
 	_textured(_box(Vector3(38, 0.06, 16), Vector3(0, 0.04, -4), Color.WHITE), Mats.textured("carpet", 6.0, 0.0, Color(0.55, 0.32, 0.36)))
 
-	# Seating clusters
-	var seat_mat := Mats.flat(Color(0.16, 0.2, 0.34), 0.5)
-	for cx in [-10, 2, 12]:
-		for row in range(3):
-			_textured(_box(Vector3(4, 0.5, 0.8), Vector3(cx, 0.5, -6 + row * 2.0), Color.WHITE), seat_mat)
-			_textured(_box(Vector3(4, 0.8, 0.2), Vector3(cx, 1.0, -6 + row * 2.0 - 0.4), Color.WHITE), seat_mat)
+	# Lounge seating — real CC0 armchairs in facing pairs
+	for cx in [-15, -8, -1, 7, 13]:
+		for i in range(2):
+			_spawn_prop(ARMCHAIR, Vector3(cx + i * 1.25, 0, -6.5), 0.0)
+			_spawn_prop(ARMCHAIR, Vector3(cx + i * 1.25, 0, -2.5), 180.0)
+
+	# Greenery
+	for pl in [Vector3(-18, 0, -10), Vector3(18, 0, -10), Vector3(-18, 0, 6), Vector3(18, 0, 6), Vector3(0, 0, -18)]:
+		_spawn_prop(PLANT, pl, randf() * 360.0, Vector3(0.5, 1.2, 0.5))
 
 	# Check-in / gate desks — metal
 	var desk_mat := Mats.textured("metal", 1.5, 0.7, Color(0.5, 0.52, 0.58))
@@ -138,6 +144,19 @@ func _build_terminal() -> void:
 func _textured(body: StaticBody3D, mat: Material) -> StaticBody3D:
 	(body.get_child(0) as MeshInstance3D).material_override = mat
 	return body
+
+func _spawn_prop(scene: PackedScene, pos: Vector3, yaw_deg: float, col := Vector3(0.85, 0.9, 0.85)) -> void:
+	var body := StaticBody3D.new()
+	body.position = pos
+	body.rotation_degrees = Vector3(0, yaw_deg, 0)
+	body.add_child(scene.instantiate())
+	var cs := CollisionShape3D.new()
+	var shape := BoxShape3D.new()
+	shape.size = col
+	cs.shape = shape
+	cs.position.y = col.y * 0.5
+	body.add_child(cs)
+	add_child(body)
 
 func _build_tower_outside() -> void:
 	# Ground apron beyond the glass

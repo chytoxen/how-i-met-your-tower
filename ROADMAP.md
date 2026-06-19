@@ -1,6 +1,12 @@
 # Roadmap
 
-Status as of **v0.3.0**.
+Status as of **v0.4.0**.
+
+## v0.4.0 — the Tower speaks + real models
+- [x] **ATC "Tower" voice** (ElevenLabs) — talks you down at contact / approach / brace / landing+crash.
+- [x] Real **alarm + explosion SFX** (ElevenLabs) replacing the synth versions.
+- [x] Real **CC0 3D models** (PolyHaven): armchairs replace the box lounge seating + potted plants for greenery.
+- [x] Tooling: Godot/ElevenLabs MCPs (Pi) + Blender MCP (→ Windows over Tailscale) + a CC0 model pipeline + an offscreen screenshot rig for verifying visuals on the headless Pi.
 
 ## v0.3.0 — bug fixes + visual/audio overhaul
 - [x] **FIXED: client black screen / can't move in co-op** — clients now always spawn

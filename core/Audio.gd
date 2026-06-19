@@ -24,6 +24,9 @@ func _ready() -> void:
 	_cache["explosion"] = _explosion()
 	_cache["touchdown"] = _touchdown()
 	_cache["step"] = _step()
+	# Real CC0/ElevenLabs SFX override the synth versions when present.
+	_load_sfx_override("alarm", true)
+	_load_sfx_override("explosion", false)
 
 # --- public API --------------------------------------------------------------
 
@@ -214,6 +217,33 @@ func _step() -> AudioStreamWAV:
 		last = last * 0.7 + white * 0.3
 		a[i] = (last * 0.6 + sin(TAU * 110.0 * t) * 0.4) * env * 0.7
 	return _make_wav(a)
+
+## Play an ATC/voice line from assets/audio/voice/<name>.mp3 (ElevenLabs).
+func play_voice(voice_name: String, volume_db := 1.0) -> void:
+	var path := "res://assets/audio/voice/%s.mp3" % voice_name
+	if not ResourceLoader.exists(path):
+		return
+	var s: Variant = load(path)
+	if not (s is AudioStream):
+		return
+	var p := AudioStreamPlayer.new()
+	p.stream = s
+	p.bus = "SFX"
+	p.volume_db = volume_db
+	add_child(p)
+	p.play()
+	p.finished.connect(p.queue_free)
+
+## Replace a synth SFX with a real file if one is bundled.
+func _load_sfx_override(sfx_name: String, loop: bool) -> void:
+	var path := "res://assets/audio/sfx/%s.mp3" % sfx_name
+	if not ResourceLoader.exists(path):
+		return
+	var s: Variant = load(path)
+	if s is AudioStreamMP3:
+		s.loop = loop
+	if s is AudioStream:
+		_cache[sfx_name] = s
 
 ## Prefer a real CC0 track from assets/audio/music/<kind>.(mp3|ogg); fall back to
 ## the synthesized loop if none is bundled.

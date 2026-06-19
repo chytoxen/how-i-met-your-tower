@@ -28,6 +28,8 @@ var _screamed := false
 var _net_accum := 0.0
 var _cabin_lights: Array = []
 var _sabotage_cd := 0.0
+var _approach_announced := false
+var _brace_announced := false
 
 func _ready() -> void:
 	scenario = GameState.pending_scenario
@@ -179,6 +181,7 @@ func _process(delta: float) -> void:
 		exterior.update(delta, fm, scenario["weather"])
 		hud.update(fm, time_left, panic, tower_contacted, stations)
 		_emergency_lighting()
+		_check_voice_cues()
 		return
 
 	time_left = maxf(0.0, time_left - delta)
@@ -200,6 +203,7 @@ func _process(delta: float) -> void:
 	_update_panic(delta, penalties)
 	hud.update(fm, time_left, panic, tower_contacted, stations)
 	_emergency_lighting()
+	_check_voice_cues()
 
 	if Net.active and Net.is_host:
 		_net_accum += delta
@@ -243,10 +247,19 @@ func _emergency_lighting() -> void:
 		l.light_color = col
 		l.light_energy = energy
 
+func _check_voice_cues() -> void:
+	if tower_contacted and fm.in_approach() and not _approach_announced:
+		_approach_announced = true
+		Audio.play_voice("atc_approach")
+	if fm.distance < 1800.0 and not _brace_announced:
+		_brace_announced = true
+		Audio.play_voice("atc_brace")
+
 func _on_station_fixed(st: TaskStation) -> void:
 	if st.failure_type == "contact_tower":
 		tower_contacted = true
 		Audio.play("radio", -4.0)
+		Audio.play_voice("atc_contact")
 		hud.flash("TOWER: \"Copy your mayday — we'll bring you home. Stand by.\"")
 
 func _resolve_landing() -> void:
@@ -366,6 +379,7 @@ func _do_finish(success: bool, headline: String) -> void:
 		"mode": GameState.match_mode,
 		"saboteur": sab_name,
 	}
+	Audio.play_voice("atc_success" if success else "atc_lost")
 	_play_cutscene(success)
 
 func _play_cutscene(success: bool) -> void:

@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.0",
   "url": "https://github.com/chytoxen/how-i-met-your-tower/releases/latest",
-  "notes": "Fixes co-op black-screen + empty photo banners + menu layout + F1 back; overhauls movement, visuals (real textures, lighting, characters) and audio (real music)."
+  "notes": "The Tower now talks you down (ElevenLabs ATC voice) + real alarm/explosion SFX + real CC0 armchairs & plants in the terminal."
 }

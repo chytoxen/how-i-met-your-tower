@@ -79,9 +79,9 @@ func _build() -> void:
 		_clouds.append(c)
 
 	# The other ship — a distant airliner off to port (two-ship flavor / easter egg)
-	var ship := _toy_plane()
+	var ship := _toy_plane(Color(0.8, 0.3, 0.25))
 	ship.position = Vector3(-180, 40, -300)
-	ship.scale = Vector3(3, 3, 3)
+	ship.scale = Vector3(2, 2, 2)
 	add_child(ship)
 
 func _reseed_cloud(c: Node3D, rng: RandomNumberGenerator, anywhere: bool) -> void:
@@ -104,37 +104,78 @@ func update(delta: float, fm: FlightModel, _weather: String) -> void:
 			rng.seed = int(Time.get_ticks_usec()) + c.get_instance_id()
 			_reseed_cloud(c, rng, false)
 
-static func _toy_plane() -> Node3D:
+## A proper airliner (nose = -Z): rounded fuselage, swept wings with dihedral,
+## underwing engines, tailplane, a liveried fin, cockpit glass + lit cabin windows.
+## Built from primitives so it ships with zero asset files and is easily restyled.
+static func _toy_plane(livery := Color(0.16, 0.42, 0.82)) -> Node3D:
 	var root := Node3D.new()
-	var body := MeshInstance3D.new()
-	var cyl := CylinderMesh.new()
-	cyl.top_radius = 1.2
-	cyl.bottom_radius = 1.2
-	cyl.height = 16
-	body.mesh = cyl
-	body.rotation_degrees = Vector3(90, 0, 0)
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.85, 0.86, 0.9)
-	body.material_override = mat
-	root.add_child(body)
-	var wing := MeshInstance3D.new()
-	var wm := BoxMesh.new()
-	wm.size = Vector3(22, 0.6, 3)
-	wing.mesh = wm
-	wing.material_override = mat
-	root.add_child(wing)
-	var tail := MeshInstance3D.new()
-	var tm := BoxMesh.new()
-	tm.size = Vector3(7, 0.5, 2)
-	tail.mesh = tm
-	tail.position = Vector3(0, 1.5, 7)
-	tail.material_override = mat
-	root.add_child(tail)
-	var fin := MeshInstance3D.new()
-	var fm := BoxMesh.new()
-	fm.size = Vector3(0.5, 4, 3)
-	fin.mesh = fm
-	fin.position = Vector3(0, 2, 7)
-	fin.material_override = mat
-	root.add_child(fin)
+	var white := _plane_mat(Color(0.93, 0.94, 0.97), 0.35, 0.1)
+	var accent := _plane_mat(livery, 0.4, 0.1)
+	var metal := _plane_mat(Color(0.42, 0.44, 0.5), 0.45, 0.8)
+	var glass := _plane_mat(Color(0.08, 0.12, 0.18), 0.05, 0.7)
+	var win := _plane_mat(Color(0.75, 0.9, 1.0), 0.2, 0.0)
+	win.emission_enabled = true
+	win.emission = Color(0.6, 0.8, 1.0)
+	win.emission_energy_multiplier = 1.4
+
+	# Fuselage — a rounded tube down the Z axis (capsule = rounded nose + tail)
+	var fus := CapsuleMesh.new()
+	fus.radius = 1.5
+	fus.height = 24.0
+	_part2(root, fus, Vector3.ZERO, Vector3(90, 0, 0), white)
+
+	# Cockpit windscreen — raked dark glass sitting on the upper-front surface
+	_part2(root, _boxm(Vector3(1.9, 0.55, 1.7)), Vector3(0, 1.0, -8.2), Vector3(-26, 0, 0), glass)
+	_part2(root, _boxm(Vector3(2.1, 0.5, 0.9)), Vector3(0, 0.55, -9.2), Vector3(-55, 0, 0), glass)
+
+	# Cheatline + lit cabin windows down each side
+	for sx in [-1.0, 1.0]:
+		_part2(root, _boxm(Vector3(0.06, 0.4, 17.0)), Vector3(sx * 1.46, 0.15, 0.5), Vector3.ZERO, accent)
+		for i in range(13):
+			var z := -7.0 + i * 1.25
+			_part2(root, _boxm(Vector3(0.05, 0.18, 0.18)), Vector3(sx * 1.5, 0.5, z), Vector3.ZERO, win)
+
+	# Wings — pivot at the fuselage so they sweep back + rise (dihedral)
+	_wing(root, -1.3, Vector3(0, 14, 5), white, metal)    # port
+	_wing(root, 1.3, Vector3(0, -14, -5), white, metal)   # starboard
+
+	# Tailplane (horizontal stabilisers) near the rear
+	for s in [-1.0, 1.0]:
+		_part2(root, _boxm(Vector3(5.0, 0.28, 1.7)), Vector3(s * 2.9, 1.4, 10.2), Vector3(0, s * 10, 0), white)
+
+	# Vertical fin (liveried), leaning back
+	_part2(root, _boxm(Vector3(0.35, 4.4, 3.4)), Vector3(0, 3.4, 10.4), Vector3(18, 0, 0), accent)
 	return root
+
+static func _wing(root: Node3D, side: float, sweep_dihedral: Vector3, mat: Material, engine_mat: Material) -> void:
+	var pivot := Node3D.new()
+	pivot.position = Vector3(side, -0.4, 1.5)
+	pivot.rotation_degrees = sweep_dihedral
+	root.add_child(pivot)
+	var dir := signf(side)
+	_part2(pivot, _boxm(Vector3(9.0, 0.32, 3.4)), Vector3(dir * 4.6, 0, 0), Vector3.ZERO, mat)
+	# engine nacelle slung under the wing
+	var nac := CapsuleMesh.new()
+	nac.radius = 0.62
+	nac.height = 3.2
+	_part2(pivot, nac, Vector3(dir * 3.6, -1.0, -0.4), Vector3(90, 0, 0), engine_mat)
+
+static func _plane_mat(c: Color, rough: float, metal: float) -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.albedo_color = c
+	m.roughness = rough
+	m.metallic = metal
+	return m
+
+static func _boxm(size: Vector3) -> BoxMesh:
+	var b := BoxMesh.new()
+	b.size = size
+	return b
+
+static func _part2(parent: Node3D, mesh: Mesh, pos: Vector3, rot_deg: Vector3, mat: Material) -> void:
+	var mi := MeshInstance3D.new()
+	mi.mesh = mesh
+	mi.position = pos
+	mi.rotation_degrees = rot_deg
+	mi.material_override = mat
+	parent.add_child(mi)

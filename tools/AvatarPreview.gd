@@ -26,6 +26,14 @@ func _ready() -> void:
 	var av := RemoteAvatar.new()
 	add_child(av)
 	av.setup("MAVERICK", Color(0.85, 0.2, 0.2))
+	av.rotation.y = PI    # turn the face (-Z) toward the +Z camera
+	av.set_process(false) # freeze for a clean screenshot
+	if OS.get_environment("WALK") != "":
+		var s := 0.5      # force a mid-stride pose to show the walk animation
+		av._l_leg.rotation.x = s
+		av._r_leg.rotation.x = -s
+		av._l_arm.rotation.x = -s * 0.8
+		av._r_arm.rotation.x = s * 0.8
 
 	var cam := Camera3D.new()
 	cam.position = Vector3(1.4, 1.5, 3.0)

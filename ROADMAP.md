@@ -1,6 +1,18 @@
 # Roadmap
 
-Status as of **v0.4.0**.
+Status as of **v0.5.0**.
+
+## v0.5.0 — playable lobby + characters with faces + a real airliner
+- [x] **FIXED (blocker): couldn't start a co-op match** — the cursor was locked to mouse-look so
+      `READY UP` / `START FLIGHT` were unclickable. The networked lobby now starts with a **free cursor**
+      (panel immediately clickable) and **ESC toggles** cursor free/locked for walking around. Verified
+      with a 2-process lobby test.
+- [x] **Crew characters now have a FACE** (eyes, smile, pilot cap, hi-vis) and proper proportions.
+- [x] **Walk animation** — arms and legs swing, body bobs and leans whenever a crewmate is moving
+      (code-driven from their actual speed, so it costs no extra network traffic).
+- [x] **Real airliner** — the toy cylinder is gone; the plane is now a proper jet (rounded fuselage,
+      swept wings + dihedral, underwing engines, tailplane, liveried swept fin, cockpit glass, lit
+      cabin windows). Used by the landing/crash cutscene and the distant "other ship".
 
 ## v0.4.0 — the Tower speaks + real models
 - [x] **ATC "Tower" voice** (ElevenLabs) — talks you down at contact / approach / brace / landing+crash.
@@ -64,8 +76,9 @@ Status as of **v0.4.0**.
 - [ ] Live multiplayer *feel* across separate machines (latency, NAT/port-forward) — code path proven, but only a real session confirms it.
 
 ## ⬜ Remaining (content & polish)
-- [ ] Replace greybox with CC0 **3D models** (Kenney/Quaternius) — UI theme/fonts + lighting are done; the model swap is the big remaining art task
-- [ ] First-person arms + character model with the chosen colors
+- [ ] Optional: swap the procedural crew/plane for downloaded stylized CC0 models (Kenney/Quaternius/KayKit)
+      via the PC + Blender pipeline if you want even more detail — the procedural ones look good and ship now
+- [ ] First-person arms (your own hands) in the cockpit/cabin view
 - [ ] Manual cockpit flying (yoke/throttle) for a pilot to beat the autopilot’s grade
 - [ ] **Two-Ship Relay** mode (+ cross-ship walkie objectives)
 - [ ] Self-replacing updater (vs. open-release-page), dedicated-server export

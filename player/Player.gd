@@ -12,6 +12,9 @@ extends CharacterBody3D
 @export var air_accel := 16.0
 @export var friction := 80.0
 @export var sprint_fov_add := 8.0
+## When true (networked lobby), the mouse starts FREE so the CREW panel is
+## clickable, and ESC toggles cursor free/locked instead of opening the pause menu.
+@export var lobby_cursor_mode := false
 
 const COYOTE_TIME := 0.12     # jump shortly after leaving a ledge
 const JUMP_BUFFER := 0.12     # jump pressed shortly before landing
@@ -37,7 +40,7 @@ func _ready() -> void:
 	_build_body()
 	_build_hud()
 	if DisplayServer.get_name() != "headless":
-		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if lobby_cursor_mode else Input.MOUSE_MODE_CAPTURED
 
 func _build_body() -> void:
 	var col := CollisionShape3D.new()
@@ -88,14 +91,25 @@ func _unhandled_input(event: InputEvent) -> void:
 		rotate_y(-mm.relative.x * mouse_sensitivity)
 		_head.rotate_x(-mm.relative.y * mouse_sensitivity)
 		_head.rotation.x = clampf(_head.rotation.x, -1.4, 1.4)
-	if event.is_action_pressed("pause") and not get_tree().paused:
-		var scene := get_tree().current_scene
-		if scene != null:
-			scene.add_child(preload("res://ui/PauseMenu.gd").new())
+	if event.is_action_pressed("pause"):
+		if lobby_cursor_mode:
+			_toggle_cursor()
+		elif not get_tree().paused:
+			var scene := get_tree().current_scene
+			if scene != null:
+				scene.add_child(preload("res://ui/PauseMenu.gd").new())
 	if event.is_action_pressed("emote"):
 		_emote()
 	if event.is_action_pressed("interact") and _target != null and _target.has_method("interact"):
 		_target.interact(self)
+
+func _toggle_cursor() -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	else:
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _physics_process(delta: float) -> void:
 	var grounded := is_on_floor()

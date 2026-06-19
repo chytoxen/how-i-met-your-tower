@@ -29,7 +29,9 @@ func _spawn_crew() -> void:
 	var crew := CrewManager.new()
 	crew.name = "CrewManager"
 	add_child(crew)
-	crew.build([Vector3(0, 0.2, 8), Vector3(-2, 0.2, 9), Vector3(2, 0.2, 9), Vector3(0, 0.2, 11)])
+	# In a networked lobby the cursor starts FREE so the CREW panel (READY UP /
+	# START FLIGHT) is clickable; ESC toggles free/locked for walking around.
+	crew.build([Vector3(0, 0.2, 8), Vector3(-2, 0.2, 9), Vector3(2, 0.2, 9), Vector3(0, 0.2, 11)], Net.active)
 
 func _spawn_departures() -> void:
 	var desk := DepartureDesk.new()
@@ -215,7 +217,10 @@ func _spawn_player_legacy() -> void:
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
 	var hint := Label.new()
-	hint.text = "WASD move · Shift sprint · Space jump · Mouse look · [E] interact · Board the glowing DEPARTURES desk to fly · ESC cursor · F1 menu"
+	if Net.active:
+		hint.text = "Cursor is FREE — click READY UP, then the host clicks START FLIGHT · ESC: toggle cursor (free to click / locked to mouse-look) · WASD move · F1 menu"
+	else:
+		hint.text = "WASD move · Shift sprint · Space jump · Mouse look · [E] interact · Board the glowing DEPARTURES desk to fly · ESC cursor · F1 menu"
 	hint.position = Vector2(16, 16)
 	hint.modulate = Color(1, 1, 1, 0.7)
 	layer.add_child(hint)

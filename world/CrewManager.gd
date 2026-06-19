@@ -13,8 +13,10 @@ var avatars := {}        # peer_id -> RemoteAvatar
 var local_player: Node3D
 var _spawn_points: Array = [Vector3.ZERO]
 var _send_accum := 0.0
+var _cursor_mode := false
 
-func build(points: Array) -> void:
+func build(points: Array, cursor_mode := false) -> void:
+	_cursor_mode = cursor_mode
 	if points.size() > 0:
 		_spawn_points = points
 	# ALWAYS spawn the local player immediately. Clients enter the lobby the moment
@@ -39,6 +41,7 @@ func _point_for(id: int) -> Vector3:
 func _spawn_local(pos: Vector3) -> void:
 	local_player = preload("res://player/Player.tscn").instantiate()
 	local_player.position = pos
+	local_player.lobby_cursor_mode = _cursor_mode
 	add_child(local_player)
 	local_spawned.emit(local_player)
 	if OS.get_environment("CREW_DEBUG") != "":

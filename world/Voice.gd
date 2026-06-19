@@ -19,7 +19,8 @@ var _capture: AudioEffectCapture
 var _enabled := false
 var _crew: Node
 var _players := {}   # peer_id -> { "player": Node, "pb": AudioStreamGeneratorPlayback }
-var _rate := 11025.0
+var _rate := 16000.0
+var _step := 3       # mix-rate frames per output sample (anti-aliased average)
 
 func setup(crew: Node) -> void:
 	_crew = crew
@@ -27,7 +28,10 @@ func setup(crew: Node) -> void:
 		return
 	if not bool(ProjectSettings.get_setting("audio/driver/enable_input", false)):
 		return
-	_rate = AudioServer.get_mix_rate() / 4.0
+	# Target ~16 kHz voice regardless of the device mix rate (44.1/48 kHz).
+	var mix := AudioServer.get_mix_rate()
+	_step = maxi(1, int(round(mix / 16000.0)))
+	_rate = mix / float(_step)
 	_init_capture()
 
 func _init_capture() -> void:
@@ -81,13 +85,20 @@ func _voice_play(id: int, bytes: PackedByteArray, channel: int) -> void:
 	_speak(id, bytes, channel)
 
 func _pack(buf: PackedVector2Array) -> PackedByteArray:
-	var step := 4
-	var count := buf.size() / step
+	# Downsample mix-rate -> ~16 kHz. Average each group of _step frames (a cheap
+	# low-pass) instead of dropping samples — naive decimation aliases high
+	# frequencies into harsh noise, which is what made the voice sound terrible.
+	var count := buf.size() / _step
 	var out := PackedByteArray()
 	out.resize(count * 2)
 	for j in count:
-		var f := buf[j * step]
-		out.encode_s16(j * 2, int(clampf((f.x + f.y) * 0.5, -1.0, 1.0) * 32767.0))
+		var acc := 0.0
+		var base := j * _step
+		for k in _step:
+			var f := buf[base + k]
+			acc += (f.x + f.y) * 0.5
+		acc /= float(_step)
+		out.encode_s16(j * 2, int(clampf(acc, -1.0, 1.0) * 32767.0))
 	return out
 
 func _speak(id: int, bytes: PackedByteArray, channel: int) -> void:
@@ -110,8 +121,13 @@ func _make_player(id: int, channel: int) -> Dictionary:
 	if channel == 0 and _crew != null and _crew.avatars.has(id):
 		var p3 := AudioStreamPlayer3D.new()
 		p3.stream = gen
-		p3.unit_size = 4.0
 		p3.bus = "SFX"
+		# Proximity: clearly full volume up close, fading to nothing by ~28 m.
+		p3.unit_size = 3.0
+		p3.max_distance = 28.0
+		p3.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
+		p3.volume_db = 3.0
+		p3.position.y = 1.6               # emit from the head, not the feet
 		_crew.avatars[id].add_child(p3)   # proximity: follows the speaker
 		player = p3
 	else:

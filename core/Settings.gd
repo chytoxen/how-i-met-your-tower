@@ -28,7 +28,7 @@ var audio_volumes := {"Master": 1.0, "Music": 0.8, "SFX": 1.0}
 var video := {
 	"fullscreen": false,
 	"vsync": true,
-	"msaa": 1,            # 0=off 1=2x 2=4x 3=8x
+	"msaa": 2,            # 0=off 1=2x 2=4x 3=8x
 	"render_scale": 1.0,  # 0.5..1.0 ; below 1.0 enables FSR2 upscaling
 	"shadow_quality": 2,  # 0=off 1=low 2=medium 3=high
 }

@@ -73,9 +73,17 @@ func _build_environment() -> void:
 	sky.sky_material = mat
 	env.sky = sky
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	env.ambient_light_energy = 0.25 if night else 0.5
-	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	env.ambient_light_energy = 0.35 if night else 0.6
+	env.tonemap_mode = Environment.TONE_MAPPER_ACES
+	env.tonemap_white = 6.0
+	env.ssao_enabled = true
+	env.ssao_intensity = 2.0
+	env.ssil_enabled = true
 	env.glow_enabled = true
+	env.glow_intensity = 0.5
+	env.adjustment_enabled = true
+	env.adjustment_contrast = 1.06
+	env.adjustment_saturation = 1.1
 	if storm:
 		env.fog_enabled = true
 		env.fog_density = 0.012

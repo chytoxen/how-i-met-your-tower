@@ -18,6 +18,7 @@ All third-party assets are CC0 / public-domain, OFL, or generated; free for this
 
 ## 3D models — CC0 (PolyHaven.com)
 - **ArmChair_01** (terminal lounge seating), **potted_plant_04** (greenery) — https://polyhaven.com
+- **vintage_suitcase** (luggage), **metal_trash_can**, **WetFloorSign_01**, **korean_fire_extinguisher_01** (terminal props) — https://polyhaven.com
 
 ## Textures — CC0 (ambientCG.com)
 - **Tiles074** (terminal floor), **Concrete034** (walls), **MetalPlates006** (pillars / hull),

@@ -1,6 +1,19 @@
 # Roadmap
 
-Status as of **v0.5.0**.
+Status as of **v0.6.0**.
+
+## v0.6.0 — voice fix + visual overhaul
+- [x] **Voice chat no longer garbled** — the downsampler took every 4th mic sample with no filter,
+      which aliased high frequencies into harsh noise. Now anti-aliased (averaged) at ~16 kHz.
+- [x] **Proximity voice tuned** — clearly full volume up close, fading to silence by ~28 m, emitted
+      from the speaker's head.
+- [x] **Smeared textures FIXED** — textures were imported with no mipmaps (built scenes in code, so
+      Godot's "detect 3D" never ran), and normal maps were treated as sRGB color. Both fixed +
+      anisotropic filtering, so floors/walls stay crisp at distance and grazing angles.
+- [x] **Less "old game" look** — MSAA 4×, ACES tonemap, SSIL + SSR + stronger SSAO, bloom, a subtle
+      color grade and depth haze, softer sun shadows (lobby + cabin).
+- [x] **Terminal no longer an empty box** — real CC0 props (luggage, trash cans, wet-floor signs,
+      fire extinguishers) + architectural trim (pillar caps/bases, baseboards, window mullions).
 
 ## v0.5.0 — playable lobby + characters with faces + a real airliner
 - [x] **FIXED (blocker): couldn't start a co-op match** — the cursor was locked to mouse-look so

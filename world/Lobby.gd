@@ -7,10 +7,15 @@ extends Node3D
 
 const ARMCHAIR := preload("res://assets/models/armchair/ArmChair_01_1k.gltf")
 const PLANT := preload("res://assets/models/plant/potted_plant_04_1k.gltf")
+const SUITCASE := preload("res://assets/models/suitcase/vintage_suitcase_1k.gltf")
+const TRASHCAN := preload("res://assets/models/trashcan/metal_trash_can_1k.gltf")
+const WETSIGN := preload("res://assets/models/wetsign/WetFloorSign_01_1k.gltf")
+const EXTINGUISHER := preload("res://assets/models/extinguisher/korean_fire_extinguisher_01_1k.gltf")
 
 func _ready() -> void:
 	_build_environment()
 	_build_terminal()
+	_build_detail()
 	_build_parkour()
 	_build_tower_outside()
 	_spawn_crew()
@@ -65,16 +70,37 @@ func _build_environment() -> void:
 	sky.sky_material = sky_mat
 	env.sky = sky
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	env.ambient_light_energy = 0.4
-	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	env.ambient_light_energy = 0.6
+	env.tonemap_mode = Environment.TONE_MAPPER_ACES
+	env.tonemap_exposure = 1.05
+	env.tonemap_white = 6.0
+	# richer lighting: contact AO, soft indirect bounce, subtle reflections + glow
 	env.ssao_enabled = true
+	env.ssao_radius = 2.0
+	env.ssao_intensity = 2.4
+	env.ssil_enabled = true
+	env.ssr_enabled = true
+	env.ssr_max_steps = 32
 	env.glow_enabled = true
+	env.glow_intensity = 0.5
+	env.glow_bloom = 0.15
+	# a touch of depth haze + a slight color grade so it doesn't look flat/dated
+	env.fog_enabled = true
+	env.fog_light_color = Color(0.62, 0.70, 0.82)
+	env.fog_density = 0.006
+	env.fog_sky_affect = 0.0
+	env.adjustment_enabled = true
+	env.adjustment_brightness = 1.02
+	env.adjustment_contrast = 1.08
+	env.adjustment_saturation = 1.12
 	we.environment = env
 	add_child(we)
 
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-52, -125, 0)
-	sun.light_energy = 1.2
+	sun.light_energy = 1.5
+	sun.light_color = Color(1.0, 0.96, 0.9)
+	sun.light_angular_distance = 1.0   # softer, more natural shadow edges
 	sun.shadow_enabled = Settings.video["shadow_quality"] > 0
 	add_child(sun)
 
@@ -142,6 +168,51 @@ func _build_terminal() -> void:
 			em.emission = Color(1, 0.95, 0.85)
 			em.emission_energy_multiplier = 2.5
 			(fix.get_child(0) as MeshInstance3D).material_override = em
+
+# --- props + architectural trim (fills the box-room, breaks up flat surfaces) ---
+
+func _build_detail() -> void:
+	# real CC0 props (each gltf packs a believable pair)
+	_spawn_prop(SUITCASE, Vector3(-7.6, 0, -3.6), 20.0, Vector3(1.3, 0.5, 0.6))
+	_spawn_prop(SUITCASE, Vector3(6.4, 0, -3.4), -35.0, Vector3(1.3, 0.5, 0.6))
+	_spawn_prop(SUITCASE, Vector3(13.4, 0, -5.8), 110.0, Vector3(1.3, 0.5, 0.6))
+	_spawn_prop(TRASHCAN, Vector3(-11.2, 0, -10.9), 0.0, Vector3(1.3, 0.9, 0.7))
+	_spawn_prop(TRASHCAN, Vector3(11.4, 0, 10.8), 25.0, Vector3(1.3, 0.9, 0.7))
+	_spawn_prop(WETSIGN, Vector3(-2.2, 0, 4.5), 25.0, Vector3(0.6, 0.9, 0.6))
+	_spawn_prop(WETSIGN, Vector3(9.0, 0, -8.5), -10.0, Vector3(0.6, 0.9, 0.6))
+	# free-standing fire extinguishers against the walls
+	for e in [[Vector3(-19.4, 0, -6.0), 90.0], [Vector3(19.4, 0, 2.0), -90.0], [Vector3(-8.0, 0, -19.4), 0.0]]:
+		var n := EXTINGUISHER.instantiate()
+		n.position = e[0]
+		n.rotation_degrees = Vector3(0, e[1], 0)
+		add_child(n)
+
+	# baseboards along the 3 solid walls
+	var trim := Mats.flat(Color(0.10, 0.11, 0.14), 0.6, 0.2)
+	_trim(Vector3(40, 0.35, 0.18), Vector3(0, 0.18, -19.7), trim)
+	_trim(Vector3(0.18, 0.35, 40), Vector3(-19.7, 0.18, 0), trim)
+	_trim(Vector3(0.18, 0.35, 40), Vector3(19.7, 0.18, 0), trim)
+	# pillar caps + bases
+	var cap := Mats.flat(Color(0.30, 0.31, 0.35), 0.5, 0.4)
+	for x in [-12, -4, 4, 12]:
+		for z in [-12, 0, 12]:
+			_trim(Vector3(1.4, 0.4, 1.4), Vector3(x, 7.8, z), cap)
+			_trim(Vector3(1.4, 0.4, 1.4), Vector3(x, 0.2, z), cap)
+	# window mullions + rails on the front glass facade (z=20)
+	var frame := Mats.flat(Color(0.16, 0.17, 0.2), 0.4, 0.5)
+	for mx in range(-18, 19, 3):
+		_trim(Vector3(0.22, 8, 0.45), Vector3(mx, 4, 20), frame)
+	_trim(Vector3(40, 0.4, 0.5), Vector3(0, 0.25, 20), frame)
+	_trim(Vector3(40, 0.4, 0.5), Vector3(0, 7.75, 20), frame)
+
+func _trim(size: Vector3, pos: Vector3, mat: Material) -> void:
+	var mi := MeshInstance3D.new()
+	var bm := BoxMesh.new()
+	bm.size = size
+	mi.mesh = bm
+	mi.material_override = mat
+	mi.position = pos
+	add_child(mi)
 
 func _textured(body: StaticBody3D, mat: Material) -> StaticBody3D:
 	(body.get_child(0) as MeshInstance3D).material_override = mat

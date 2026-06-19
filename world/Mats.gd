@@ -23,6 +23,9 @@ static func textured(tex: String, uv_scale := 1.0, metallic := 0.0, tint := Colo
 	m.metallic = metallic
 	m.metallic_specular = 0.5
 	m.uv1_scale = Vector3(uv_scale, uv_scale, uv_scale)
+	# Mipmaps + anisotropic filtering — kills the "smeared at grazing angles"
+	# look on tiled floors/walls and the shimmer on distant surfaces.
+	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 	_cache[key] = m
 	return m
 

@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "url": "https://github.com/chytoxen/how-i-met-your-tower/releases/latest",
-  "notes": "v0.5.0 — you can finally start a co-op match (free cursor in the lobby + ESC toggle), crew now have faces and a walk animation, and the plane is a real airliner instead of a flying cylinder."
+  "notes": "v0.6.0 — voice chat no longer sounds garbled (and proximity fade is tuned), textures no longer smeared, and the whole game got a lighting + detail pass (real terminal props, crisper surfaces, modern post-processing)."
 }

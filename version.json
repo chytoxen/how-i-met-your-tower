@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0",
+  "version": "0.5.0",
   "url": "https://github.com/chytoxen/how-i-met-your-tower/releases/latest",
-  "notes": "The Tower now talks you down (ElevenLabs ATC voice) + real alarm/explosion SFX + real CC0 armchairs & plants in the terminal."
+  "notes": "v0.5.0 — you can finally start a co-op match (free cursor in the lobby + ESC toggle), crew now have faces and a walk animation, and the plane is a real airliner instead of a flying cylinder."
 }

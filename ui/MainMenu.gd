@@ -5,6 +5,14 @@ extends Control
 var _update_shown := false
 
 func _ready() -> void:
+	# Dev GPU photo-tour: if a photo.json sits next to the executable, skip the
+	# menu and render the configured shots on the real GPU, then quit. (Only the
+	# dev-deployed copy has that file; the shipped game never does.)
+	var pj := OS.get_executable_path().get_base_dir().path_join("photo.json")
+	if FileAccess.file_exists(pj):
+		get_tree().root.add_child.call_deferred(preload("res://tools/PhotoTour.gd").new())
+		queue_free()
+		return
 	if DisplayServer.get_name() != "headless":
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		Audio.start_music("menu")

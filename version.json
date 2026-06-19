@@ -1,5 +1,5 @@
 {
-  "version": "0.7.0",
+  "version": "0.8.0",
   "url": "https://github.com/chytoxen/how-i-met-your-tower/releases/latest",
-  "notes": "v0.7.0 — a full stylized art pass on the world: the terminal is now a real, designed space (curated palette, ceiling light strips, a glowing departures board, gate signs, wayfinding, dust + god-rays) and the cabin got clean panels + warm LED lighting. Goodbye textured-box look."
+  "notes": "v0.8.0 — the world out the windows got the stylized pass too: a real lit runway (edge/approach/PAPI lights), a dusk city skyline lit from within, and soft clouds. Plus I can now render previews on real GPU hardware."
 }

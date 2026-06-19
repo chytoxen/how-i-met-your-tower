@@ -1,6 +1,15 @@
 # Roadmap
 
-Status as of **v0.6.0**.
+Status as of **v0.7.0**.
+
+## v0.7.0 — stylized environment art pass ("clean indie", not Scratch)
+- [x] Committed to a cohesive **clean stylized indie** art direction for the world.
+- [x] **Terminal rebuilt**: curated palette (cool concrete + warm white + teal & amber accents),
+      coffered ceiling with recessed warm light strips, columns with teal accent glow + uplights,
+      a glowing **DEPARTURES board**, hanging gate signs, floor **wayfinding** stripes, a proper
+      glass curtain wall, and floating **dust-mote atmosphere** + volumetric god-rays.
+- [x] **Cabin restyled**: clean cream panels + warm LED cove lighting (cohesive with the terminal).
+- [x] Dropped the generic realistic-marble-on-boxes look that read as "amateur".
 
 ## v0.6.0 — voice fix + visual overhaul
 - [x] **Voice chat no longer garbled** — the downsampler took every 4th mic sample with no filter,

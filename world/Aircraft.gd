@@ -99,12 +99,18 @@ func _build_environment() -> void:
 	add_child(sun)
 
 func _build_fuselage() -> void:
-	var hull_mat := Mats.textured("metal", 4.0, 0.4, Color(0.82, 0.84, 0.88))
+	# Stylized clean cabin panels (cream) — cohesive with the terminal's look.
+	var hull_mat := Mats.flat(Color(0.86, 0.85, 0.81), 0.72, 0.0)
 
-	# floor (carpet aisle) + ceiling (brushed hull)
+	# floor (carpet aisle) + ceiling (panels)
 	var fl := _solid_box(Vector3(5.0, 0.3, 34.0), Vector3(0, -0.15, 9.0), Color.WHITE)
-	(fl.get_child(0) as MeshInstance3D).material_override = Mats.textured("carpet", 8.0, 0.0, Color(0.28, 0.31, 0.4))
+	(fl.get_child(0) as MeshInstance3D).material_override = Mats.textured("carpet", 8.0, 0.0, Color(0.24, 0.30, 0.40))
 	_mesh_box(Vector3(5.0, 0.2, 34.0), Vector3(0, 2.7, 9.0), Color.WHITE).material_override = hull_mat
+	# warm LED cove strips along the ceiling edges + a center runner (modern cabin glow)
+	var cove := Mats.emissive(Color(1.0, 0.93, 0.82), 1.9)
+	for sx in [-2.25, 2.25]:
+		_mesh_box(Vector3(0.1, 0.08, 34.0), Vector3(sx, 2.52, 9.0), Color.WHITE).material_override = cove
+	_mesh_box(Vector3(0.35, 0.06, 34.0), Vector3(0, 2.62, 9.0), Color.WHITE).material_override = cove
 	# tail wall
 	var tw := _solid_box(Vector3(5.0, 3.0, 0.3), Vector3(0, 1.4, 26.0), Color.WHITE)
 	(tw.get_child(0) as MeshInstance3D).material_override = hull_mat

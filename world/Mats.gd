@@ -35,3 +35,23 @@ static func flat(color: Color, rough := 0.7, metallic := 0.0) -> StandardMateria
 	m.roughness = rough
 	m.metallic = metallic
 	return m
+
+## Emissive panel/strip (signage, light fixtures, accent glow).
+static func emissive(color: Color, energy := 2.0) -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.albedo_color = color
+	m.emission_enabled = true
+	m.emission = color
+	m.emission_energy_multiplier = energy
+	m.roughness = 0.4
+	return m
+
+## Tinted architectural glass for the curtain wall.
+static func glass(tint := Color(0.55, 0.72, 0.85, 0.12)) -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.albedo_color = tint
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.metallic = 0.8
+	m.roughness = 0.03
+	m.refraction_enabled = false
+	return m

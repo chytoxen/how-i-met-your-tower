@@ -27,9 +27,7 @@ func setup(callsign: String, color: Color) -> void:
 	var skin := _mat(Color(0.86, 0.69, 0.56), 0.7)
 	var dark := _mat(Color(0.12, 0.13, 0.16), 0.5)
 	var white := _mat(Color(0.95, 0.96, 0.98), 0.4)
-	var hi := _mat(Color(0.98, 0.86, 0.12), 0.5)
-	hi.emission_enabled = true
-	hi.emission = Color(0.55, 0.48, 0.1)
+	var hi := _mat(Color(0.82, 0.70, 0.16), 0.6)   # hi-vis: bright but MATTE, not glowing
 
 	# pelvis / torso (the torso pivot lets the whole upper body bob + lean)
 	_torso = Node3D.new()

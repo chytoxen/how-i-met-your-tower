@@ -16,6 +16,8 @@ func _ready() -> void:
 	var w := get_window()
 	if w != null:
 		w.size = Vector2i(1600, 900)
+		# park the window offscreen so it doesn't flash on Noam's monitor
+		DisplayServer.window_set_position(Vector2i(-2200, 80))
 	_run.call_deferred()
 
 func _process(_d: float) -> void:
@@ -44,6 +46,7 @@ func _capture(shot: Dictionary, out_dir: String) -> bool:
 	var inst := (load(sp) as PackedScene).instantiate()
 	add_child(inst)
 	await get_tree().create_timer(0.7).timeout            # let the scene build + settle
+	_hide_huds(inst)                                       # clean beauty shot, no UI overlay
 	var cam := Camera3D.new()
 	cam.fov = float(shot.get("fov", 70.0))
 	var p: Array = shot.get("pos", [0, 2, 8])
@@ -62,6 +65,12 @@ func _capture(shot: Dictionary, out_dir: String) -> bool:
 	cam.queue_free()
 	await get_tree().process_frame
 	return ok
+
+func _hide_huds(n: Node) -> void:
+	if n is CanvasLayer or n is Control:
+		n.visible = false
+	for c in n.get_children():
+		_hide_huds(c)
 
 func _load_config() -> Dictionary:
 	var p := _exe_dir.path_join("photo.json")

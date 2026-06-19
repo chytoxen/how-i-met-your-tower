@@ -19,16 +19,21 @@ func _ready() -> void:
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
 	env.tonemap_white = 6.0
 	env.glow_enabled = true
-	env.glow_intensity = 0.9
-	env.glow_bloom = 0.3
-	env.glow_hdr_threshold = 0.85
+	env.glow_intensity = 0.35
+	env.glow_bloom = 0.12
+	env.glow_hdr_threshold = 1.25
 	env.ssil_enabled = true
-	env.volumetric_fog_enabled = true
-	env.volumetric_fog_density = 0.005
-	env.volumetric_fog_albedo = Color(0.5, 0.55, 0.72)
+	# depth fog matched to the sky → distant city fades to the horizon (atmospheric perspective)
+	env.fog_enabled = true
+	env.fog_mode = Environment.FOG_MODE_DEPTH
+	env.fog_light_color = Color(0.42, 0.36, 0.42)
+	env.fog_light_energy = 0.6
+	env.fog_density = 0.0018
+	env.fog_aerial_perspective = 1.0
+	env.fog_sky_affect = 0.0
 	env.adjustment_enabled = true
-	env.adjustment_contrast = 1.1
-	env.adjustment_saturation = 1.15
+	env.adjustment_contrast = 1.0
+	env.adjustment_saturation = 0.95
 	we.environment = env
 	add_child(we)
 

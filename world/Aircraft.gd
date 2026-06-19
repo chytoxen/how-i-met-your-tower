@@ -73,17 +73,19 @@ func _build_environment() -> void:
 	sky.sky_material = mat
 	env.sky = sky
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	env.ambient_light_energy = 0.35 if night else 0.6
+	env.ambient_light_energy = 0.3 if night else 0.45
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
+	env.tonemap_exposure = 1.05
 	env.tonemap_white = 6.0
 	env.ssao_enabled = true
 	env.ssao_intensity = 2.0
 	env.ssil_enabled = true
 	env.glow_enabled = true
-	env.glow_intensity = 0.5
+	env.glow_intensity = 0.22
+	env.glow_hdr_threshold = 1.4
 	env.adjustment_enabled = true
-	env.adjustment_contrast = 1.06
-	env.adjustment_saturation = 1.1
+	env.adjustment_contrast = 1.0
+	env.adjustment_saturation = 0.98
 	if storm:
 		env.fog_enabled = true
 		env.fog_density = 0.012
@@ -106,8 +108,8 @@ func _build_fuselage() -> void:
 	var fl := _solid_box(Vector3(5.0, 0.3, 34.0), Vector3(0, -0.15, 9.0), Color.WHITE)
 	(fl.get_child(0) as MeshInstance3D).material_override = Mats.textured("carpet", 8.0, 0.0, Color(0.24, 0.30, 0.40))
 	_mesh_box(Vector3(5.0, 0.2, 34.0), Vector3(0, 2.7, 9.0), Color.WHITE).material_override = hull_mat
-	# warm LED cove strips along the ceiling edges + a center runner (modern cabin glow)
-	var cove := Mats.emissive(Color(1.0, 0.93, 0.82), 1.9)
+	# warm LED cove strips along the ceiling edges + a center runner (soft, not neon)
+	var cove := Mats.emissive(Color(1.0, 0.93, 0.84), 1.5)
 	for sx in [-2.25, 2.25]:
 		_mesh_box(Vector3(0.1, 0.08, 34.0), Vector3(sx, 2.52, 9.0), Color.WHITE).material_override = cove
 	_mesh_box(Vector3(0.35, 0.06, 34.0), Vector3(0, 2.62, 9.0), Color.WHITE).material_override = cove
@@ -137,12 +139,13 @@ func _build_fuselage() -> void:
 		for seat_x in [-1.7, -1.15, 1.15, 1.7]:
 			_seat(Vector3(seat_x, 0.0, z), true)
 
-	# overhead lights
+	# overhead lights — warm cabin key
 	for z in range(-4, 26, 5):
 		var lamp := OmniLight3D.new()
 		lamp.position = Vector3(0, 2.5, z)
-		lamp.light_energy = 0.8
-		lamp.omni_range = 7.0
+		lamp.light_color = Color(1.0, 0.91, 0.80)
+		lamp.light_energy = 1.3
+		lamp.omni_range = 8.0
 		add_child(lamp)
 		_cabin_lights.append(lamp)
 
@@ -530,18 +533,32 @@ func _glass(size: Vector3, pos: Vector3) -> void:
 	mi.material_override = m
 
 func _seat(pos: Vector3, passenger := false) -> void:
-	_mesh_box(Vector3(0.45, 0.45, 0.45), pos + Vector3(0, 0.45, 0), Color(0.18, 0.22, 0.34))
-	_mesh_box(Vector3(0.45, 0.5, 0.12), pos + Vector3(0, 0.7, -0.2), Color(0.18, 0.22, 0.34))
-	if passenger:
-		var body := _mesh_box(Vector3(0.34, 0.5, 0.3), pos + Vector3(0, 0.85, 0), Color(0.3, 0.27, 0.25))
-		body.name = "pax"
-		var head := MeshInstance3D.new()
-		var sm := SphereMesh.new()
-		sm.radius = 0.12
-		sm.height = 0.24
-		head.mesh = sm
-		var hm := StandardMaterial3D.new()
-		hm.albedo_color = Color(0.7, 0.55, 0.45)
-		head.material_override = hm
-		head.position = pos + Vector3(0, 1.25, 0)
-		add_child(head)
+	var fab := Color(0.15, 0.19, 0.28)                                  # muted seat fabric
+	_mesh_box(Vector3(0.46, 0.42, 0.46), pos + Vector3(0, 0.42, 0), fab)            # cushion
+	_mesh_box(Vector3(0.46, 0.55, 0.12), pos + Vector3(0, 0.72, -0.2), fab)         # backrest
+	_mesh_box(Vector3(0.06, 0.36, 0.40), pos + Vector3(-0.24, 0.55, 0), fab.darkened(0.15))  # armrests
+	_mesh_box(Vector3(0.06, 0.36, 0.40), pos + Vector3(0.24, 0.55, 0), fab.darkened(0.15))
+	if not passenger:
+		return
+	# A seated figure built from a few matte boxes — varied (deterministic per seat)
+	# so rows of people aren't identical. Muted clothing, no neon.
+	var clothes := [Color(0.30, 0.33, 0.40), Color(0.40, 0.28, 0.26), Color(0.26, 0.34, 0.30),
+		Color(0.42, 0.40, 0.34), Color(0.22, 0.25, 0.31), Color(0.37, 0.31, 0.37)]
+	var hairs := [Color(0.09, 0.07, 0.05), Color(0.20, 0.13, 0.08), Color(0.32, 0.32, 0.34), Color(0.24, 0.15, 0.09)]
+	var skins := [Color(0.80, 0.64, 0.52), Color(0.66, 0.50, 0.40), Color(0.86, 0.71, 0.59), Color(0.55, 0.42, 0.34)]
+	var idx := int(absf(pos.x * 7.0 + pos.z * 13.0))
+	var cloth: Color = clothes[idx % clothes.size()]
+	var hair: Color = hairs[(idx / 2) % hairs.size()]
+	var skin: Color = skins[(idx / 3) % skins.size()]
+	var body := _mesh_box(Vector3(0.40, 0.42, 0.30), pos + Vector3(0, 0.95, 0.03), cloth)   # torso
+	body.name = "pax"
+	_mesh_box(Vector3(0.12, 0.10, 0.12), pos + Vector3(0, 1.20, 0.03), skin)                # neck
+	var head := MeshInstance3D.new()
+	var sm := SphereMesh.new()
+	sm.radius = 0.115
+	sm.height = 0.23
+	head.mesh = sm
+	head.material_override = Mats.flat(skin, 0.6, 0.0)
+	head.position = pos + Vector3(0, 1.33, 0.03)
+	add_child(head)
+	_mesh_box(Vector3(0.25, 0.12, 0.24), pos + Vector3(0, 1.41, 0.0), hair)                 # hair cap

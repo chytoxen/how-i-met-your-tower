@@ -12,14 +12,14 @@ const TRASHCAN := preload("res://assets/models/trashcan/metal_trash_can_1k.gltf"
 const WETSIGN := preload("res://assets/models/wetsign/WetFloorSign_01_1k.gltf")
 const EXTINGUISHER := preload("res://assets/models/extinguisher/korean_fire_extinguisher_01_1k.gltf")
 
-# --- cohesive stylized palette (clean indie look) ---
-const C_FLOOR := Color(0.66, 0.67, 0.71)
-const C_WALL := Color(0.88, 0.88, 0.90)
-const C_DARK := Color(0.11, 0.12, 0.15)
-const C_TEAL := Color(0.06, 0.55, 0.55)
-const C_AMBER := Color(0.98, 0.62, 0.18)
-const C_METAL := Color(0.74, 0.76, 0.80)
-const C_WOOD := Color(0.50, 0.36, 0.24)
+# --- cohesive stylized palette (MUTED — see ART_DIRECTION.md; accents are not neon) ---
+const C_FLOOR := Color(0.60, 0.60, 0.61)
+const C_WALL := Color(0.84, 0.83, 0.80)   # warm off-white
+const C_DARK := Color(0.13, 0.14, 0.16)
+const C_TEAL := Color(0.30, 0.45, 0.46)   # muted teal-grey, used MATTE
+const C_AMBER := Color(0.74, 0.56, 0.32)  # muted ochre
+const C_METAL := Color(0.64, 0.65, 0.68)
+const C_WOOD := Color(0.46, 0.34, 0.24)
 
 func _ready() -> void:
 	_build_environment()
@@ -82,10 +82,10 @@ func _build_environment() -> void:
 	sky.sky_material = sky_mat
 	env.sky = sky
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	env.ambient_light_energy = 0.5
-	env.ambient_light_color = Color(0.62, 0.70, 0.82)
+	env.ambient_light_energy = 0.38              # gentle cool fill (don't wash out the warm key)
+	env.ambient_light_color = Color(0.66, 0.69, 0.76)
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
-	env.tonemap_exposure = 1.0
+	env.tonemap_exposure = 1.05
 	env.tonemap_white = 6.0
 	env.ssao_enabled = true
 	env.ssao_radius = 1.6
@@ -93,31 +93,32 @@ func _build_environment() -> void:
 	env.ssil_enabled = true
 	env.ssr_enabled = true
 	env.ssr_max_steps = 48
+	# Subtle bloom — only genuinely bright lights bloom, not every surface (anti-neon).
 	env.glow_enabled = true
-	env.glow_intensity = 0.65
-	env.glow_bloom = 0.2
-	env.glow_hdr_threshold = 1.0
-	# Volumetric fog = visible light shafts (god rays) through the glass facade
-	# and a cohesive, atmospheric depth — the big "indie modern" tell.
+	env.glow_intensity = 0.22
+	env.glow_bloom = 0.08
+	env.glow_hdr_threshold = 1.4
+	# Light haze for soft god-rays + atmospheric depth (restrained, not milky).
 	env.volumetric_fog_enabled = true
-	env.volumetric_fog_density = 0.018
-	env.volumetric_fog_albedo = Color(0.82, 0.87, 0.96)
+	env.volumetric_fog_density = 0.010
+	env.volumetric_fog_albedo = Color(0.80, 0.84, 0.92)
 	env.volumetric_fog_length = 90.0
-	env.volumetric_fog_gi_inject = 0.7
+	env.volumetric_fog_gi_inject = 0.5
+	# Grade: DESATURATE slightly, natural contrast (the old +sat/+contrast read garish).
 	env.adjustment_enabled = true
 	env.adjustment_brightness = 1.0
-	env.adjustment_contrast = 1.10
-	env.adjustment_saturation = 1.16
+	env.adjustment_contrast = 1.0
+	env.adjustment_saturation = 0.98
 	we.environment = env
 	add_child(we)
 
-	# Warm key sun raking in through the front glass wall (casts the shafts).
+	# Warm key sun raking in through the front glass wall (motivated light).
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-34, 152, 0)
-	sun.light_energy = 2.4
-	sun.light_color = Color(1.0, 0.92, 0.78)
+	sun.light_energy = 2.1
+	sun.light_color = Color(1.0, 0.94, 0.82)
 	sun.light_angular_distance = 1.2   # soft, natural shadow edges
-	sun.light_volumetric_fog_energy = 2.2
+	sun.light_volumetric_fog_energy = 1.4
 	sun.shadow_enabled = Settings.video["shadow_quality"] > 0
 	add_child(sun)
 
@@ -166,11 +167,11 @@ func _build_terminal() -> void:
 	for dx in [-14, -7, 0, 7, 14]:
 		_mat_box(Vector3(3, 1.0, 1.2), Vector3(dx, 0.5, -17), base_mat)
 		_trim(Vector3(3.2, 0.12, 1.4), Vector3(dx, 1.06, -17), top_mat)
-		_trim(Vector3(0.9, 0.55, 0.06), Vector3(dx, 1.55, -16.6), Mats.emissive(Color(0.4, 0.75, 0.95), 1.6))
+		_trim(Vector3(0.9, 0.55, 0.06), Vector3(dx, 1.55, -16.6), Mats.emissive(Color(0.42, 0.55, 0.66), 0.7))
 
-	# Flyable-plane pads — amber accent
+	# Flyable-plane pads — matte painted floor marker
 	for px in [-16, 16]:
-		_mat_box(Vector3(2, 0.1, 2), Vector3(px, 0.05, 16), Mats.emissive(C_AMBER, 0.8))
+		_mat_box(Vector3(2, 0.1, 2), Vector3(px, 0.05, 16), Mats.flat(C_AMBER, 0.7, 0.0))
 
 func _build_ceiling() -> void:
 	# Dark coffered ceiling with recessed warm light strips between the beams.
@@ -180,30 +181,27 @@ func _build_ceiling() -> void:
 		_trim(Vector3(0.5, 0.6, 40), Vector3(x, 8.6, 0), beam)      # beams along Z
 	for z in [-16, -8, 0, 8, 16]:
 		_trim(Vector3(40, 0.6, 0.5), Vector3(0, 8.6, z), beam)      # beams along X
-	# recessed linear light strips + soft fill lights
-	var strip := Mats.emissive(Color(1.0, 0.96, 0.88), 2.6)
+	# recessed linear light strips (real fixtures: gentle emission) + WARM key fill lights
+	# (warm pools vs the cool sky fill = the warm/cool contrast that makes it feel alive)
+	var strip := Mats.emissive(Color(1.0, 0.95, 0.88), 1.4)
 	for x in [-12, -4, 4, 12]:
 		_trim(Vector3(1.2, 0.08, 34), Vector3(x, 8.55, 0), strip)
-		var lamp := OmniLight3D.new()
-		lamp.position = Vector3(x, 8.2, 0)
-		lamp.light_color = Color(1.0, 0.95, 0.86)
-		lamp.light_energy = 3.0
-		lamp.omni_range = 22.0
-		add_child(lamp)
+		for lz in [-11, 0, 11]:
+			var lamp := OmniLight3D.new()
+			lamp.position = Vector3(x, 8.2, lz)
+			lamp.light_color = Color(1.0, 0.90, 0.78)
+			lamp.light_energy = 3.0
+			lamp.omni_range = 20.0
+			add_child(lamp)
 
 func _column(base: Vector3) -> void:
-	_mat_box(Vector3(1.0, 8.4, 1.0), base + Vector3(0, 4.2, 0), Mats.flat(C_METAL, 0.35, 0.6))
-	var cap := Mats.flat(C_DARK, 0.5, 0.3)
+	# matte clean column (no glow — lit by the environment)
+	_mat_box(Vector3(1.0, 8.4, 1.0), base + Vector3(0, 4.2, 0), Mats.flat(C_METAL, 0.55, 0.0))
+	var cap := Mats.flat(C_DARK, 0.6, 0.0)
 	_trim(Vector3(1.5, 0.45, 1.5), base + Vector3(0, 8.2, 0), cap)
 	_trim(Vector3(1.5, 0.45, 1.5), base + Vector3(0, 0.22, 0), cap)
-	# teal accent light strip up one face + a small uplight pooling on it
-	_trim(Vector3(0.18, 6.5, 0.18), base + Vector3(0, 4.0, -0.52), Mats.emissive(C_TEAL, 2.2))
-	var up := OmniLight3D.new()
-	up.position = base + Vector3(0, 1.2, -0.8)
-	up.light_color = C_TEAL
-	up.light_energy = 1.4
-	up.omni_range = 5.0
-	add_child(up)
+	# a single MATTE painted accent line (no emission)
+	_trim(Vector3(0.16, 6.3, 0.16), base + Vector3(0, 4.0, -0.52), Mats.flat(C_TEAL, 0.6, 0.0))
 
 # --- props + architectural trim (fills the box-room, breaks up flat surfaces) ---
 
@@ -304,7 +302,7 @@ func _build_signage() -> void:
 		r.text = rows[i]
 		r.font_size = 56
 		r.pixel_size = 0.0095
-		r.modulate = Color(1.0, 0.78, 0.3)
+		r.modulate = Color(0.78, 0.66, 0.42)
 		r.position = Vector3(0, 5.5 - i * 0.62, -19.5)
 		add_child(r)
 
@@ -313,8 +311,8 @@ func _build_signage() -> void:
 	_hang_sign(Vector3(9, 6.4, -1), "GATES 3-4 →", C_TEAL)
 	_hang_sign(Vector3(0, 6.4, 11), "↓ DEPARTURES", C_AMBER)
 
-	# Floor wayfinding stripe leading to the departures desk
-	var stripe := Mats.emissive(C_TEAL, 0.6)
+	# Floor wayfinding stripe — MATTE painted line (not a glowing strip)
+	var stripe := Mats.flat(C_TEAL, 0.7, 0.0)
 	for z in range(-2, 13, 1):
 		_trim(Vector3(0.5, 0.04, 0.7), Vector3(0, 0.06, float(z)), stripe)
 

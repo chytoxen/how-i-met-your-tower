@@ -30,21 +30,21 @@ func _build() -> void:
 		_runway.add_child(_xbox(Vector3(2.4, 1.1, 24), Vector3(0, 0.6, -440 + i * 58), white))
 	for k in range(8):                                   # threshold "piano keys"
 		_runway.add_child(_xbox(Vector3(4.4, 1.1, 26), Vector3(-22.0 + k * 6.3, 0.6, 408), white))
-	# emissive edge lights both sides (bloom makes them glow)
-	var edge := Mats.emissive(Color(0.80, 0.88, 1.0), 6.0)
+	# emissive edge lights both sides (points of light, restrained — let bloom be subtle)
+	var edge := Mats.emissive(Color(0.85, 0.90, 0.96), 2.6)
 	for i in range(25):
 		var z := -450.0 + i * 38.0
 		_runway.add_child(_xbox(Vector3(1.5, 1.5, 1.5), Vector3(-31, 1.0, z), edge))
 		_runway.add_child(_xbox(Vector3(1.5, 1.5, 1.5), Vector3(31, 1.0, z), edge))
 	# green threshold bar / red far-end bar
-	_runway.add_child(_xbox(Vector3(60, 1.4, 2.2), Vector3(0, 1.0, 422), Mats.emissive(Color(0.2, 1.0, 0.4), 6.0)))
-	_runway.add_child(_xbox(Vector3(60, 1.4, 2.2), Vector3(0, 1.0, -470), Mats.emissive(Color(1.0, 0.2, 0.2), 6.0)))
+	_runway.add_child(_xbox(Vector3(60, 1.4, 2.2), Vector3(0, 1.0, 422), Mats.emissive(Color(0.25, 0.8, 0.4), 2.8)))
+	_runway.add_child(_xbox(Vector3(60, 1.4, 2.2), Vector3(0, 1.0, -470), Mats.emissive(Color(0.85, 0.25, 0.22), 2.8)))
 	# PAPI glideslope lights (2 white + 2 red) left of the threshold
 	for p in range(4):
-		var col: Color = Color(1, 1, 1) if p < 2 else Color(1, 0.25, 0.2)
-		_runway.add_child(_xbox(Vector3(2.2, 2.2, 2.2), Vector3(-40, 1.6, 405 - p * 4.5), Mats.emissive(col, 7.0)))
+		var col: Color = Color(0.95, 0.95, 0.95) if p < 2 else Color(0.9, 0.3, 0.25)
+		_runway.add_child(_xbox(Vector3(2.2, 2.2, 2.2), Vector3(-40, 1.6, 405 - p * 4.5), Mats.emissive(col, 3.2)))
 	# approach "rabbit" lights leading in beyond the threshold
-	var appr := Mats.emissive(Color(1.0, 0.98, 0.92), 8.0)
+	var appr := Mats.emissive(Color(0.95, 0.94, 0.90), 3.4)
 	for i in range(12):
 		_runway.add_child(_xbox(Vector3(6, 1.3, 1.6), Vector3(0, 1.0, 445 + i * 24), appr))
 
@@ -59,10 +59,10 @@ func _build() -> void:
 		var bmat := StandardMaterial3D.new()
 		bmat.albedo_color = Color(g, g + 0.02, g + 0.07)
 		bmat.roughness = 0.9
-		if rng.randf() < 0.4:                            # lit building
+		if rng.randf() < 0.4:                            # lit building (subtle warm interior)
 			bmat.emission_enabled = true
-			bmat.emission = Color(1.0, 0.82, 0.5)
-			bmat.emission_energy_multiplier = 0.28
+			bmat.emission = Color(0.85, 0.72, 0.52)
+			bmat.emission_energy_multiplier = 0.10
 		var side := -1.0 if rng.randf() < 0.5 else 1.0
 		var b := _xbox(Vector3(w, h, d),
 			Vector3(side * rng.randf_range(95, 720), h * 0.5, rng.randf_range(-1200, 250)), bmat)

@@ -1,6 +1,17 @@
 # Roadmap
 
-Status as of **v0.8.0**.
+Status as of **v0.9.0**.
+
+## v0.9.0 — de-neon pass + art-direction standard
+- [x] **Killed the "too neon" look** (see `ART_DIRECTION.md`): glowing architecture → matte (columns,
+      wayfinding, signage, hi-vis); cut bloom + raised its threshold; removed the global saturation boost
+      (now slightly desaturated); muted the teal/amber accents.
+- [x] **Restored warmth** after the de-neon went too cold: a warm key light (ceiling/cove) vs a gentle
+      cool fill = the warm/cool contrast the reference look depends on (lobby + cabin).
+- [x] **Passengers** rebuilt from "egg-head on a block" into varied seated figures (muted clothes/hair).
+- [x] **Photo-tour** now hides the HUD and renders offscreen (clean beauty shots, no window flashing).
+- [x] `ART_DIRECTION.md` — a concrete checklist (matte, ~2-temperature palette, desaturate, value/depth,
+      motivated light) derived from real reference, applied to every render going forward.
 
 ## v0.8.0 — stylized exterior + autonomous GPU previews
 - [x] **Exterior/runway restyled** to match the terminal: a real runway (asphalt, centerline,

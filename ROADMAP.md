@@ -1,6 +1,15 @@
 # Roadmap
 
-Status as of **v0.7.0**.
+Status as of **v0.8.0**.
+
+## v0.8.0 — stylized exterior + autonomous GPU previews
+- [x] **Exterior/runway restyled** to match the terminal: a real runway (asphalt, centerline,
+      threshold "piano keys") with **emissive edge / approach / PAPI / threshold lights**, a cohesive
+      **dusk city skyline** with buildings lit from within, and soft cloud layers (the chunky cloud
+      boxes are gone).
+- [x] **Autonomous GPU render pipeline** (dev tooling): the game has a hidden photo-tour mode that
+      renders chosen camera shots; the Pi cross-compiles, deploys to the Windows PC, and triggers an
+      interactive scheduled task so previews render on the real RTX 3070 — no more software-render guessing.
 
 ## v0.7.0 — stylized environment art pass ("clean indie", not Scratch)
 - [x] Committed to a cohesive **clean stylized indie** art direction for the world.

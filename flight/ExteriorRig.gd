@@ -13,67 +13,65 @@ func _ready() -> void:
 	_build()
 
 func _build() -> void:
-	# Ground
+	# Stylized ground — muted cohesive earth (cool, low-key so the lights read)
 	_ground = MeshInstance3D.new()
 	var pm := PlaneMesh.new()
 	pm.size = Vector2(4000, 4000)
 	_ground.mesh = pm
-	var gm := StandardMaterial3D.new()
-	gm.albedo_color = Color(0.20, 0.30, 0.18)
-	gm.roughness = 1.0
-	_ground.material_override = gm
+	_ground.material_override = Mats.flat(Color(0.15, 0.19, 0.18), 1.0, 0.0)
 	add_child(_ground)
 
-	# Runway ahead (down the -Z axis = out the windshield)
+	# Runway down -Z (the near "approach" end is toward +Z, out the windshield).
 	_runway = Node3D.new()
 	add_child(_runway)
-	var strip := MeshInstance3D.new()
-	var smesh := BoxMesh.new()
-	smesh.size = Vector3(60, 1, 900)
-	strip.mesh = smesh
-	var sm := StandardMaterial3D.new()
-	sm.albedo_color = Color(0.12, 0.12, 0.13)
-	strip.material_override = sm
-	strip.position.y = 0.5
-	_runway.add_child(strip)
-	for i in range(10):
-		var dash := MeshInstance3D.new()
-		var dm := BoxMesh.new()
-		dm.size = Vector3(3, 1.1, 30)
-		dash.mesh = dm
-		var dmat := StandardMaterial3D.new()
-		dmat.albedo_color = Color(0.9, 0.9, 0.9)
-		dash.material_override = dmat
-		dash.position = Vector3(0, 0.6, -400 + i * 90)
-		_runway.add_child(dash)
+	_runway.add_child(_xbox(Vector3(60, 1, 940), Vector3(0, 0.5, 0), Mats.flat(Color(0.07, 0.07, 0.09), 0.65, 0.0)))
+	var white := Mats.flat(Color(0.92, 0.93, 0.95), 0.5, 0.0)
+	for i in range(16):                                  # centerline dashes
+		_runway.add_child(_xbox(Vector3(2.4, 1.1, 24), Vector3(0, 0.6, -440 + i * 58), white))
+	for k in range(8):                                   # threshold "piano keys"
+		_runway.add_child(_xbox(Vector3(4.4, 1.1, 26), Vector3(-22.0 + k * 6.3, 0.6, 408), white))
+	# emissive edge lights both sides (bloom makes them glow)
+	var edge := Mats.emissive(Color(0.80, 0.88, 1.0), 6.0)
+	for i in range(25):
+		var z := -450.0 + i * 38.0
+		_runway.add_child(_xbox(Vector3(1.5, 1.5, 1.5), Vector3(-31, 1.0, z), edge))
+		_runway.add_child(_xbox(Vector3(1.5, 1.5, 1.5), Vector3(31, 1.0, z), edge))
+	# green threshold bar / red far-end bar
+	_runway.add_child(_xbox(Vector3(60, 1.4, 2.2), Vector3(0, 1.0, 422), Mats.emissive(Color(0.2, 1.0, 0.4), 6.0)))
+	_runway.add_child(_xbox(Vector3(60, 1.4, 2.2), Vector3(0, 1.0, -470), Mats.emissive(Color(1.0, 0.2, 0.2), 6.0)))
+	# PAPI glideslope lights (2 white + 2 red) left of the threshold
+	for p in range(4):
+		var col: Color = Color(1, 1, 1) if p < 2 else Color(1, 0.25, 0.2)
+		_runway.add_child(_xbox(Vector3(2.2, 2.2, 2.2), Vector3(-40, 1.6, 405 - p * 4.5), Mats.emissive(col, 7.0)))
+	# approach "rabbit" lights leading in beyond the threshold
+	var appr := Mats.emissive(Color(1.0, 0.98, 0.92), 8.0)
+	for i in range(12):
+		_runway.add_child(_xbox(Vector3(6, 1.3, 1.6), Vector3(0, 1.0, 445 + i * 24), appr))
 
-	# City blocks beside the approach
+	# Dusk city beside the approach — cohesive cool palette, ~40% lit from within
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 7
-	for i in range(60):
-		var b := MeshInstance3D.new()
-		var bm := BoxMesh.new()
-		var h := rng.randf_range(10, 70)
-		bm.size = Vector3(rng.randf_range(15, 40), h, rng.randf_range(15, 40))
-		b.mesh = bm
+	for i in range(56):
+		var h := rng.randf_range(12, 95)
+		var w := rng.randf_range(16, 42)
+		var d := rng.randf_range(16, 42)
+		var g := rng.randf_range(0.13, 0.26)
 		var bmat := StandardMaterial3D.new()
-		var g := rng.randf_range(0.25, 0.5)
-		bmat.albedo_color = Color(g, g, g + 0.05)
-		b.material_override = bmat
+		bmat.albedo_color = Color(g, g + 0.02, g + 0.07)
+		bmat.roughness = 0.9
+		if rng.randf() < 0.4:                            # lit building
+			bmat.emission_enabled = true
+			bmat.emission = Color(1.0, 0.82, 0.5)
+			bmat.emission_energy_multiplier = 0.28
 		var side := -1.0 if rng.randf() < 0.5 else 1.0
-		b.position = Vector3(side * rng.randf_range(90, 700), h * 0.5, rng.randf_range(-1200, 200))
+		var b := _xbox(Vector3(w, h, d),
+			Vector3(side * rng.randf_range(95, 720), h * 0.5, rng.randf_range(-1200, 250)), bmat)
 		add_child(b)
 
-	# Clouds
-	for i in range(14):
-		var c := MeshInstance3D.new()
-		var cm := BoxMesh.new()
-		cm.size = Vector3(rng.randf_range(30, 80), rng.randf_range(6, 14), rng.randf_range(30, 80))
-		c.mesh = cm
-		var cmat := StandardMaterial3D.new()
-		cmat.albedo_color = Color(0.9, 0.92, 0.95, 0.5)
-		cmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		c.material_override = cmat
+	# Soft, flat cloud layers (the chunky boxes read as "amateur")
+	for i in range(16):
+		var c := _xbox(Vector3(rng.randf_range(70, 170), rng.randf_range(3, 7), rng.randf_range(70, 170)),
+			Vector3.ZERO, _cloud_mat())
 		_reseed_cloud(c, rng, true)
 		add_child(c)
 		_clouds.append(c)
@@ -83,6 +81,21 @@ func _build() -> void:
 	ship.position = Vector3(-180, 40, -300)
 	ship.scale = Vector3(2, 2, 2)
 	add_child(ship)
+
+func _xbox(size: Vector3, pos: Vector3, mat: Material) -> MeshInstance3D:
+	var mi := MeshInstance3D.new()
+	var bm := BoxMesh.new()
+	bm.size = size
+	mi.mesh = bm
+	mi.material_override = mat
+	mi.position = pos
+	return mi
+
+func _cloud_mat() -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.albedo_color = Color(0.92, 0.94, 0.98, 0.30)
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	return m
 
 func _reseed_cloud(c: Node3D, rng: RandomNumberGenerator, anywhere: bool) -> void:
 	var z := rng.randf_range(-400, 20) if anywhere else rng.randf_range(-420, -360)

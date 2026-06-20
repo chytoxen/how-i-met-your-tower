@@ -1,5 +1,5 @@
 {
-  "version": "0.11.0",
+  "version": "0.12.0",
   "url": "https://github.com/chytoxen/how-i-met-your-tower/releases/latest",
-  "notes": "v0.11.0 — a real city skyline (Kenney buildings), curated characters (normal-folk passengers, funny players), and a character customization screen with a live 3D preview."
+  "notes": "v0.12.0 — the airport waiting room is now a real furnished lounge, and every repair task has its own distinct, recognisable station (machines, levers, valves, panels, tanks) instead of identical boxes."
 }

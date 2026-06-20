@@ -1,5 +1,5 @@
 {
-  "version": "0.10.0",
+  "version": "0.11.0",
   "url": "https://github.com/chytoxen/how-i-met-your-tower/releases/latest",
-  "notes": "v0.10.0 — crew and passengers are now real animated characters (CC0 Kenney models) instead of blocky placeholders. First step of a cohesive art pass; buildings, furniture and music are next."
+  "notes": "v0.11.0 — a real city skyline (Kenney buildings), curated characters (normal-folk passengers, funny players), and a character customization screen with a live 3D preview."
 }

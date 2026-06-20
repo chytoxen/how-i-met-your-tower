@@ -7,6 +7,17 @@ extends Node3D
 
 const ARMCHAIR := preload("res://assets/models/armchair/ArmChair_01_1k.gltf")
 const PLANT := preload("res://assets/models/plant/potted_plant_04_1k.gltf")
+# Kenney Furniture Kit (CC0, vertex-coloured) — cohesive with the crew characters.
+const F_SOFA := preload("res://assets/models/kenney_furniture/loungeSofa.glb")
+const F_SOFA_LONG := preload("res://assets/models/kenney_furniture/loungeSofaLong.glb")
+const F_CHAIR := preload("res://assets/models/kenney_furniture/loungeChair.glb")
+const F_TABLE := preload("res://assets/models/kenney_furniture/tableCoffee.glb")
+const F_PLANT := preload("res://assets/models/kenney_furniture/pottedPlant.glb")
+const F_LAMP := preload("res://assets/models/kenney_furniture/lampSquareFloor.glb")
+const F_BOOKCASE := preload("res://assets/models/kenney_furniture/bookcaseOpen.glb")
+const F_DESK := preload("res://assets/models/kenney_furniture/desk.glb")
+const F_SCREEN := preload("res://assets/models/kenney_furniture/computerScreen.glb")
+const F_BENCH := preload("res://assets/models/kenney_furniture/benchCushion.glb")
 const SUITCASE := preload("res://assets/models/suitcase/vintage_suitcase_1k.gltf")
 const TRASHCAN := preload("res://assets/models/trashcan/metal_trash_can_1k.gltf")
 const WETSIGN := preload("res://assets/models/wetsign/WetFloorSign_01_1k.gltf")
@@ -151,23 +162,34 @@ func _build_terminal() -> void:
 	# Gate-area carpet — cohesive teal-grey
 	_mat_box(Vector3(38, 0.06, 16), Vector3(0, 0.04, -4), Mats.textured("carpet", 6.0, 0.0, Color(0.28, 0.40, 0.44)))
 
-	# Lounge seating — armchairs in facing pairs
-	for cx in [-15, -8, -1, 7, 13]:
-		for i in range(2):
-			_spawn_prop(ARMCHAIR, Vector3(cx + i * 1.25, 0, -6.5), 0.0)
-			_spawn_prop(ARMCHAIR, Vector3(cx + i * 1.25, 0, -2.5), 180.0)
+	# Lounge seating clusters — real Kenney furniture around coffee tables.
+	for cx in [-15, -7.5, 6.5, 13.5]:
+		_furn(F_SOFA_LONG, Vector3(cx, 0, -7.0), 0.0, 2.1)             # sofa facing in
+		_furn(F_CHAIR, Vector3(cx - 1.6, 0, -4.0), 70.0, 2.1)
+		_furn(F_CHAIR, Vector3(cx + 1.6, 0, -4.0), -70.0, 2.1)
+		_furn(F_TABLE, Vector3(cx, 0, -4.6), 0.0, 2.1)
+		_furn(F_PLANT, Vector3(cx - 2.3, 0, -7.4), randf() * 360.0, 2.0)
+		_furn(F_LAMP, Vector3(cx + 2.3, 0, -7.4), 0.0, 2.0)
 
-	# Greenery
-	for pl in [Vector3(-18, 0, -10), Vector3(18, 0, -10), Vector3(-18, 0, 6), Vector3(18, 0, 6), Vector3(0, 0, -18)]:
+	# A reading nook + waiting benches near the windows
+	_furn(F_BOOKCASE, Vector3(-18.4, 0, 8.0), 90.0, 2.2)
+	_furn(F_BOOKCASE, Vector3(-18.4, 0, 10.0), 90.0, 2.2)
+	for bz in [-2, 2]:
+		_furn(F_BENCH, Vector3(17.5, 0, bz), -90.0, 2.2)
+
+	# Greenery (mix the taller PolyHaven plant + Kenney potted plants)
+	for pl in [Vector3(-18, 0, -10), Vector3(18, 0, -10), Vector3(-18, 0, 6), Vector3(0, 0, -18)]:
 		_spawn_prop(PLANT, pl, randf() * 360.0, Vector3(0.5, 1.2, 0.5))
+	for pl2 in [Vector3(-11, 0, -18), Vector3(11, 0, -18), Vector3(18, 0, 6)]:
+		_furn(F_PLANT, pl2, randf() * 360.0, 2.2)
 
-	# Check-in desks — dark base, warm counter top, glowing monitor
+	# Check-in desks — Kenney desk + monitor kiosk on a counter
 	var base_mat := Mats.flat(C_DARK, 0.5, 0.2)
 	var top_mat := Mats.flat(C_WOOD, 0.6, 0.0)
 	for dx in [-14, -7, 0, 7, 14]:
 		_mat_box(Vector3(3, 1.0, 1.2), Vector3(dx, 0.5, -17), base_mat)
 		_trim(Vector3(3.2, 0.12, 1.4), Vector3(dx, 1.06, -17), top_mat)
-		_trim(Vector3(0.9, 0.55, 0.06), Vector3(dx, 1.55, -16.6), Mats.emissive(Color(0.42, 0.55, 0.66), 0.7))
+		_furn(F_SCREEN, Vector3(dx, 1.12, -17.0), 180.0, 1.8)
 
 	# Flyable-plane pads — matte painted floor marker
 	for px in [-16, 16]:
@@ -246,6 +268,39 @@ func _trim(size: Vector3, pos: Vector3, mat: Material) -> void:
 func _textured(body: StaticBody3D, mat: Material) -> StaticBody3D:
 	(body.get_child(0) as MeshInstance3D).material_override = mat
 	return body
+
+## Place a (scaled) furniture model with a simple box collider sized to its AABB.
+func _furn(scene: PackedScene, pos: Vector3, yaw_deg: float, scl: float) -> void:
+	var body := StaticBody3D.new()
+	body.position = pos
+	body.rotation_degrees = Vector3(0, yaw_deg, 0)
+	var inst := scene.instantiate()
+	inst.scale = Vector3(scl, scl, scl)
+	body.add_child(inst)
+	var aabb := _node_aabb(inst)
+	var cs := CollisionShape3D.new()
+	var shape := BoxShape3D.new()
+	shape.size = Vector3(maxf(aabb.size.x, 0.3), maxf(aabb.size.y, 0.3), maxf(aabb.size.z, 0.3))
+	cs.shape = shape
+	cs.position = aabb.position + aabb.size * 0.5
+	body.add_child(cs)
+	add_child(body)
+
+func _node_aabb(n: Node) -> AABB:
+	var out := AABB()
+	var has := false
+	if n is MeshInstance3D and (n as MeshInstance3D).mesh != null:
+		var t := (n as Node3D).transform if n is Node3D else Transform3D.IDENTITY
+		out = t * (n as MeshInstance3D).mesh.get_aabb()
+		has = true
+	for c in n.get_children():
+		var sub := _node_aabb(c)
+		if sub.size != Vector3.ZERO:
+			if n is Node3D:
+				sub = (n as Node3D).transform * sub
+			out = out.merge(sub) if has else sub
+			has = true
+	return out
 
 func _spawn_prop(scene: PackedScene, pos: Vector3, yaw_deg: float, col := Vector3(0.85, 0.9, 0.85)) -> void:
 	var body := StaticBody3D.new()

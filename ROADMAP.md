@@ -1,6 +1,15 @@
 # Roadmap
 
-Status as of **v0.11.0**.
+Status as of **v0.12.0**.
+
+## v0.12.0 — waiting-room overhaul + detailed mission stations
+- [x] **Waiting room (terminal)**: real Kenney **Furniture Kit** — lounge sofas/chairs around coffee
+      tables, plants, floor lamps, bookcases, bench seating, and monitor kiosks on the check-in desks.
+- [x] **Detailed task stations**: each of the 8 failure types now has a **distinct, recognisable**
+      station (CC0 Kenney) instead of an identical box — a heavy machine (engine fire), a window machine
+      (smoke), levers (hydraulics), a valve (fuel leak), a control panel (electrical), an orange tank
+      (decompression), a screwed hull patch (bird strike), a gear machine (gear jam).
+- [ ] **Music**: generated music needs a paid ElevenLabs plan; left for a decision (see below).
 
 ## v0.11.0 — buildings + character customization
 - [x] **Real city skyline**: the exterior boxes are now Kenney **City Kit** buildings (detail buildings +

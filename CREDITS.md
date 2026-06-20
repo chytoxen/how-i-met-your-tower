@@ -18,7 +18,9 @@ All third-party assets are CC0 / public-domain, OFL, or generated; free for this
 
 ## 3D models — CC0 (Kenney.nl)
 - **Blocky Characters** (crew + passengers, animated) — https://kenney.nl
-- **City Kit (Commercial)** (dusk skyline buildings) — https://kenney.nl  ·  *Furniture Kit pending*
+- **City Kit (Commercial)** (dusk skyline buildings) — https://kenney.nl
+- **Furniture Kit** (airport waiting-room lounge: sofas, chairs, tables, lamps, bookcases, kiosks) — https://kenney.nl
+- **Factory Kit / Space Station Kit / Survival Kit** (detailed repair-task stations: machines, levers, valves, panels, tanks) — https://kenney.nl
 
 ## 3D models — CC0 (PolyHaven.com)
 - **ArmChair_01** (terminal lounge seating), **potted_plant_04** (greenery) — https://polyhaven.com

@@ -13,6 +13,20 @@ const PRETTY := {
 	"cabin_smoke": "CABIN SMOKE", "bird_strike": "BIRD STRIKE",
 }
 
+# Each failure type gets a DISTINCT, recognisable station (CC0 Kenney models).
+# m=model, s=scale, y=mount height, base=needs a pedestal under it (props), else
+# the model is the whole console.
+const STATIONS := {
+	"engine_fire":   {"m": "kenney_factory/machine-fortified",      "s": 0.95, "y": 0.0, "base": false},
+	"gear_jam":      {"m": "kenney_factory/machine",                "s": 0.95, "y": 0.0, "base": false},
+	"cabin_smoke":   {"m": "kenney_factory/machine-window",         "s": 0.95, "y": 0.0, "base": false},
+	"hydraulics":    {"m": "kenney_factory/lever-double",           "s": 1.7,  "y": 0.95, "base": true},
+	"fuel_leak":     {"m": "kenney_factory/pipe-large-valve",       "s": 1.0,  "y": 1.0,  "base": true},
+	"electrical":    {"m": "kenney_factory/screen-panel-wide",      "s": 1.3,  "y": 1.05, "base": true},
+	"decompression": {"m": "kenney_survival/barrel",                "s": 3.2,  "y": 0.9,  "base": true},
+	"bird_strike":   {"m": "kenney_survival/metal-panel-screws",    "s": 1.6,  "y": 1.05, "base": true},
+}
+
 var failure_type := ""
 var zone := ""
 var severity := 1
@@ -44,34 +58,47 @@ func _ready() -> void:
 	_refresh()
 
 func _build_visual() -> void:
-	var console := MeshInstance3D.new()
-	var cmesh := BoxMesh.new()
-	cmesh.size = Vector3(1.1, 1.2, 0.6)
-	console.mesh = cmesh
-	var cm := StandardMaterial3D.new()
-	cm.albedo_color = Color(0.15, 0.16, 0.2)
-	cm.metallic = 0.3
-	cm.roughness = 0.5
-	console.material_override = cm
-	console.position.y = 0.6
-	add_child(console)
+	var spec: Dictionary = STATIONS.get(failure_type, {"m": "kenney_factory/machine", "s": 0.95, "y": 0.0, "base": false})
+
+	# pedestal under "prop" stations (lever/valve/barrel/panel) so they sit at a
+	# usable height and read as a console; machine-type stations stand on their own.
+	if spec.get("base", false):
+		var ped := MeshInstance3D.new()
+		var pm := BoxMesh.new()
+		pm.size = Vector3(0.95, 0.9, 0.7)
+		ped.mesh = pm
+		var pmat := StandardMaterial3D.new()
+		pmat.albedo_color = Color(0.16, 0.17, 0.21)
+		pmat.metallic = 0.2
+		pmat.roughness = 0.6
+		ped.material_override = pmat
+		ped.position.y = 0.45
+		add_child(ped)
+
+	var model_path := "res://assets/models/%s.glb" % spec["m"]
+	if ResourceLoader.exists(model_path):
+		var model: Node3D = (load(model_path) as PackedScene).instantiate()
+		var s: float = spec["s"]
+		model.scale = Vector3(s, s, s)
+		model.position.y = spec["y"]
+		add_child(model)
 
 	var cs := CollisionShape3D.new()
 	var shape := BoxShape3D.new()
-	shape.size = Vector3(1.1, 1.2, 0.6)
+	shape.size = Vector3(1.1, 1.5, 0.8)
 	cs.shape = shape
-	cs.position.y = 0.6
+	cs.position.y = 0.75
 	add_child(cs)
 
 	_light = MeshInstance3D.new()
 	var lmesh := SphereMesh.new()
-	lmesh.radius = 0.09
-	lmesh.height = 0.18
+	lmesh.radius = 0.1
+	lmesh.height = 0.2
 	_light.mesh = lmesh
 	_light_mat = StandardMaterial3D.new()
 	_light_mat.emission_enabled = true
 	_light.material_override = _light_mat
-	_light.position = Vector3(0, 1.25, 0.31)
+	_light.position = Vector3(0.42, 1.55, 0.0)
 	add_child(_light)
 
 	_label = Label3D.new()

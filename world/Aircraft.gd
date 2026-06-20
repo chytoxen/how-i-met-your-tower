@@ -545,6 +545,7 @@ func _seat(pos: Vector3, passenger := false) -> void:
 	var pax := Characters.make(Characters.normal_for(idx), "sit")
 	pax.name = "pax"
 	pax.rotation.y = PI
-	pax.scale = Vector3(0.62, 0.62, 0.62)
+	var ps := Characters.HUMAN_SCALE
+	pax.scale = Vector3(ps, ps, ps)
 	pax.position = pos + Vector3(0, 0.05, 0.12)
 	add_child(pax)

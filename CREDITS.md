@@ -6,6 +6,9 @@ All third-party assets are CC0 / public-domain, OFL, or generated; free for this
 - **Orbitron** by Matt McInerney — https://fonts.google.com/specimen/Orbitron (titles)
 - **Rajdhani** by Indian Type Foundry — https://fonts.google.com/specimen/Rajdhani (body)
 
+## Audio — ElevenLabs (generated, free tier)
+- Flight tense ambient bed, repair-success chime, Boeing-style master-warning alarm — generated via ElevenLabs sound-effects API.
+
 ## Music — CC0 (OpenGameArt.org), trimmed + re-encoded
 - Menu / ambient: **"waiting40"** — https://opengameart.org/content/waiting40
 - Flight / tension: **"It Lies Ahead"** — https://opengameart.org/content/it-lies-ahead

@@ -13,6 +13,17 @@ const FUNNY_NAMES := {
 	"n": "Geisha", "o": "Caveman", "r": "Ninja",
 }
 
+# A Kenney character is 2.72 m tall at scale 1; this makes them ~1.8 m (player
+# height) so ALL characters — crew, passengers, the first-person body — match.
+const HUMAN_SCALE := 0.66
+
+## Hide the head node (separate mesh, not skinned) — used for the first-person
+## body so the player's own head doesn't clip the camera.
+static func hide_head(model: Node) -> void:
+	var head: Node = model.find_child("head", true, false)
+	if head != null:
+		(head as Node3D).visible = false
+
 ## Load a character GLB (matte, animated) and start `anim` looping. `id` is a
 ## letter a..r; unknown ids fall back to the first funny option.
 static func make(id: String, anim := "idle") -> Node3D:

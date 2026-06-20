@@ -1,6 +1,14 @@
 # Roadmap
 
-Status as of **v0.12.0**.
+Status as of **v0.13.0**.
+
+## v0.13.0 — first-person body + scale pass + real audio
+- [x] **First-person body**: you now see your own (chosen) character's torso/arms/legs when you look
+      down, like a real FPS — head hidden so it never blocks the view; idle/walk driven by movement.
+- [x] **Scale audit**: all characters unified to ~1.8 m (`Characters.HUMAN_SCALE`, was inconsistent
+      crew 2.1 m / passenger 1.7 m), lounge seating right-sized — verified against a 1.8 m reference.
+- [x] **Real audio** (ElevenLabs, free SFX tier — Music API is paid): tense flight ambient bed,
+      repair-success chime, and an authentic Boeing-style master-warning alarm. Calm menu bed approved too.
 
 ## v0.12.0 — waiting-room overhaul + detailed mission stations
 - [x] **Waiting room (terminal)**: real Kenney **Furniture Kit** — lounge sofas/chairs around coffee

@@ -27,6 +27,7 @@ func _ready() -> void:
 	# Real CC0/ElevenLabs SFX override the synth versions when present.
 	_load_sfx_override("alarm", true)
 	_load_sfx_override("explosion", false)
+	_load_sfx_override("confirm", false)   # ElevenLabs repair-success chime
 
 # --- public API --------------------------------------------------------------
 

@@ -5,7 +5,7 @@ extends Node3D
 ## floating callsign. Transform is fed by CrewManager from the owner's RPCs and
 ## smoothed here. (18 character variants → crew + passengers look varied.)
 
-const SCALE := 0.78
+const SCALE := Characters.HUMAN_SCALE
 
 var _target_pos: Vector3
 var _target_yaw: float

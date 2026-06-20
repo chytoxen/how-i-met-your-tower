@@ -164,10 +164,10 @@ func _build_terminal() -> void:
 
 	# Lounge seating clusters — real Kenney furniture around coffee tables.
 	for cx in [-15, -7.5, 6.5, 13.5]:
-		_furn(F_SOFA_LONG, Vector3(cx, 0, -7.0), 0.0, 2.1)             # sofa facing in
-		_furn(F_CHAIR, Vector3(cx - 1.6, 0, -4.0), 70.0, 2.1)
-		_furn(F_CHAIR, Vector3(cx + 1.6, 0, -4.0), -70.0, 2.1)
-		_furn(F_TABLE, Vector3(cx, 0, -4.6), 0.0, 2.1)
+		_furn(F_SOFA_LONG, Vector3(cx, 0, -7.0), 0.0, 1.9)             # sofa facing in
+		_furn(F_CHAIR, Vector3(cx - 1.5, 0, -4.0), 70.0, 1.9)
+		_furn(F_CHAIR, Vector3(cx + 1.5, 0, -4.0), -70.0, 1.9)
+		_furn(F_TABLE, Vector3(cx, 0, -4.6), 0.0, 1.9)
 		_furn(F_PLANT, Vector3(cx - 2.3, 0, -7.4), randf() * 360.0, 2.0)
 		_furn(F_LAMP, Vector3(cx + 2.3, 0, -7.4), 0.0, 2.0)
 

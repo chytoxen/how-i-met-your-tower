@@ -35,6 +35,7 @@ var _jump_buf := 0.0
 var _base_fov := 85.0
 var _bob_t := 0.0
 var _step_t := 0.0
+var _body_ap: AnimationPlayer   # drives the first-person body's idle/walk
 
 func _ready() -> void:
 	_build_body()
@@ -60,6 +61,17 @@ func _build_body() -> void:
 	_camera.current = true
 	_camera.fov = _base_fov
 	_head.add_child(_camera)
+
+	# First-person body — your own (chosen) character, visible when you look down,
+	# like a real FPS. Head hidden so it never blocks the camera; idle/walk driven
+	# by movement speed. A child of the body so it turns with yaw but not pitch.
+	var fp_body := Characters.make(GameState.profile.get("character", "r"), "idle")
+	fp_body.rotation.y = PI
+	var bs := Characters.HUMAN_SCALE
+	fp_body.scale = Vector3(bs, bs, bs)
+	Characters.hide_head(fp_body)
+	add_child(fp_body)
+	_body_ap = Characters.find_anim(fp_body)
 
 	_interact_ray = RayCast3D.new()
 	_interact_ray.target_position = Vector3(0, 0, -3.0)
@@ -150,6 +162,15 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	_update_view(delta, sprinting, crouching)
 	_update_interaction()
+	_update_body_anim()
+
+func _update_body_anim() -> void:
+	if _body_ap == null:
+		return
+	var spd := Vector2(velocity.x, velocity.z).length()
+	var want := "walk" if (spd > 0.6 and is_on_floor()) else "idle"
+	if _body_ap.current_animation != want and _body_ap.has_animation(want):
+		_body_ap.play(want, 0.2)
 
 func _update_view(delta: float, sprinting: bool, crouching: bool) -> void:
 	if _camera == null or _head == null:

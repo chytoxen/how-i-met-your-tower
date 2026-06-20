@@ -1,5 +1,5 @@
 {
-  "version": "0.9.0",
+  "version": "0.10.0",
   "url": "https://github.com/chytoxen/how-i-met-your-tower/releases/latest",
-  "notes": "v0.9.0 — fixed the 'too neon' look: matte surfaces instead of glowing ones, muted palette, restrained bloom, and a proper warm/cool lighting balance. Plus better passengers."
+  "notes": "v0.10.0 — crew and passengers are now real animated characters (CC0 Kenney models) instead of blocky placeholders. First step of a cohesive art pass; buildings, furniture and music are next."
 }

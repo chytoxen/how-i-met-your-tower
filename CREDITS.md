@@ -16,6 +16,9 @@ All third-party assets are CC0 / public-domain, OFL, or generated; free for this
   Used under the ElevenLabs free plan (attribution to ElevenLabs as required).
 - All other SFX (beeps, engine, footsteps, etc.) are synthesized in code (`core/Audio.gd`).
 
+## 3D models — CC0 (Kenney.nl)
+- **Blocky Characters** (crew + passengers, animated) — https://kenney.nl  ·  *City Kit & Furniture Kit pending integration*
+
 ## 3D models — CC0 (PolyHaven.com)
 - **ArmChair_01** (terminal lounge seating), **potted_plant_04** (greenery) — https://polyhaven.com
 - **vintage_suitcase** (luggage), **metal_trash_can**, **WetFloorSign_01**, **korean_fire_extinguisher_01** (terminal props) — https://polyhaven.com

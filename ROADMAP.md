@@ -1,6 +1,14 @@
 # Roadmap
 
-Status as of **v0.9.0**.
+Status as of **v0.10.0**.
+
+## v0.10.0 — real characters (cohesive CC0 art pass begins)
+- [x] Crew + passengers are now **real animated Kenney "Blocky Characters"** (CC0) instead of my
+      hand-built figures / egg-heads — faces, clothes, **idle/walk/sit animations**, 18 variants.
+- [x] **Fetched autonomously from the Pi** (no PC needed): web tools find Kenney's direct CDN zip URL,
+      curl + unzip → GLB. Same method now staged for the **City Kit** (buildings) + **Furniture Kit** (props).
+- [ ] Next: standardize the whole game on the cohesive Kenney style — buildings/skyline, terminal
+      furniture/props, then better music + textures (each GPU-verified against `ART_DIRECTION.md`).
 
 ## v0.9.0 — de-neon pass + art-direction standard
 - [x] **Killed the "too neon" look** (see `ART_DIRECTION.md`): glowing architecture → matte (columns,

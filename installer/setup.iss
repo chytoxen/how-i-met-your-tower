@@ -5,7 +5,7 @@
 ; — a normal Windows installer you can hand to friends.
 
 #define MyAppName "How I Met Your Tower"
-#define MyAppVersion "0.9.0"
+#define MyAppVersion "0.10.0"
 #define MyAppPublisher "Squad Six"
 #define MyAppExe "HowIMetYourTower.exe"
 

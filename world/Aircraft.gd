@@ -540,25 +540,10 @@ func _seat(pos: Vector3, passenger := false) -> void:
 	_mesh_box(Vector3(0.06, 0.36, 0.40), pos + Vector3(0.24, 0.55, 0), fab.darkened(0.15))
 	if not passenger:
 		return
-	# A seated figure built from a few matte boxes — varied (deterministic per seat)
-	# so rows of people aren't identical. Muted clothing, no neon.
-	var clothes := [Color(0.30, 0.33, 0.40), Color(0.40, 0.28, 0.26), Color(0.26, 0.34, 0.30),
-		Color(0.42, 0.40, 0.34), Color(0.22, 0.25, 0.31), Color(0.37, 0.31, 0.37)]
-	var hairs := [Color(0.09, 0.07, 0.05), Color(0.20, 0.13, 0.08), Color(0.32, 0.32, 0.34), Color(0.24, 0.15, 0.09)]
-	var skins := [Color(0.80, 0.64, 0.52), Color(0.66, 0.50, 0.40), Color(0.86, 0.71, 0.59), Color(0.55, 0.42, 0.34)]
+	# A real seated Kenney character (animated "sit"), varied per seat.
 	var idx := int(absf(pos.x * 7.0 + pos.z * 13.0))
-	var cloth: Color = clothes[idx % clothes.size()]
-	var hair: Color = hairs[(idx / 2) % hairs.size()]
-	var skin: Color = skins[(idx / 3) % skins.size()]
-	var body := _mesh_box(Vector3(0.40, 0.42, 0.30), pos + Vector3(0, 0.95, 0.03), cloth)   # torso
-	body.name = "pax"
-	_mesh_box(Vector3(0.12, 0.10, 0.12), pos + Vector3(0, 1.20, 0.03), skin)                # neck
-	var head := MeshInstance3D.new()
-	var sm := SphereMesh.new()
-	sm.radius = 0.115
-	sm.height = 0.23
-	head.mesh = sm
-	head.material_override = Mats.flat(skin, 0.6, 0.0)
-	head.position = pos + Vector3(0, 1.33, 0.03)
-	add_child(head)
-	_mesh_box(Vector3(0.25, 0.12, 0.24), pos + Vector3(0, 1.41, 0.0), hair)                 # hair cap
+	var pax := RemoteAvatar.spawn_char(idx, "sit")
+	pax.name = "pax"
+	pax.scale = Vector3(0.62, 0.62, 0.62)
+	pax.position = pos + Vector3(0, 0.05, 0.12)
+	add_child(pax)

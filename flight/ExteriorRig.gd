@@ -48,25 +48,13 @@ func _build() -> void:
 	for i in range(12):
 		_runway.add_child(_xbox(Vector3(6, 1.3, 1.6), Vector3(0, 1.0, 445 + i * 24), appr))
 
-	# Dusk city beside the approach — cohesive cool palette, ~40% lit from within
+	# Dusk city skyline beside the approach — real Kenney City Kit buildings (CC0).
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 7
-	for i in range(56):
-		var h := rng.randf_range(12, 95)
-		var w := rng.randf_range(16, 42)
-		var d := rng.randf_range(16, 42)
-		var g := rng.randf_range(0.13, 0.26)
-		var bmat := StandardMaterial3D.new()
-		bmat.albedo_color = Color(g, g + 0.02, g + 0.07)
-		bmat.roughness = 0.9
-		if rng.randf() < 0.4:                            # lit building (subtle warm interior)
-			bmat.emission_enabled = true
-			bmat.emission = Color(0.85, 0.72, 0.52)
-			bmat.emission_energy_multiplier = 0.10
+	for i in range(60):
 		var side := -1.0 if rng.randf() < 0.5 else 1.0
-		var b := _xbox(Vector3(w, h, d),
-			Vector3(side * rng.randf_range(95, 720), h * 0.5, rng.randf_range(-1200, 250)), bmat)
-		add_child(b)
+		var pos := Vector3(side * rng.randf_range(95, 760), 0.0, rng.randf_range(-1250, 280))
+		add_child(_city_building(rng, pos))
 
 	# Soft, flat cloud layers (the chunky boxes read as "amateur")
 	for i in range(16):
@@ -81,6 +69,46 @@ func _build() -> void:
 	ship.position = Vector3(-180, 40, -300)
 	ship.scale = Vector3(2, 2, 2)
 	add_child(ship)
+
+const _SKYSCRAPERS := ["a", "b", "c", "d", "e"]
+const _BUILDINGS := ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n"]
+
+## One Kenney City Kit building, scaled to skyline height, with a subtle warm
+## "lit windows" emission tint on some of them. ~⅓ are tall skyscrapers.
+func _city_building(rng: RandomNumberGenerator, pos: Vector3) -> Node3D:
+	var path: String
+	var target_h: float
+	if rng.randf() < 0.35:
+		path = "res://assets/models/kenney_city/building-skyscraper-%s.glb" % _SKYSCRAPERS[rng.randi() % _SKYSCRAPERS.size()]
+		target_h = rng.randf_range(55.0, 95.0)
+	else:
+		path = "res://assets/models/kenney_city/building-%s.glb" % _BUILDINGS[rng.randi() % _BUILDINGS.size()]
+		target_h = rng.randf_range(22.0, 48.0)
+	var model: Node3D = (load(path) as PackedScene).instantiate()
+	# native heights: skyscraper ~2.88, building ~1.29 → uniform scale to target
+	var native := 2.88 if path.contains("skyscraper") else 1.29
+	var s := target_h / native
+	model.scale = Vector3(s, s, s)
+	model.position = pos
+	model.rotation.y = rng.randf() * TAU
+	# dusk tint: most dark, ~40% glow faintly warm from within
+	var lit := rng.randf() < 0.4
+	_tint_meshes(model, lit)
+	return model
+
+func _tint_meshes(n: Node, lit: bool) -> void:
+	if n is MeshInstance3D and (n as MeshInstance3D).mesh != null:
+		var mi := n as MeshInstance3D
+		var m := StandardMaterial3D.new()
+		m.albedo_color = Color(0.22, 0.24, 0.30) if not lit else Color(0.30, 0.27, 0.24)
+		m.roughness = 0.92
+		if lit:
+			m.emission_enabled = true
+			m.emission = Color(0.85, 0.72, 0.52)
+			m.emission_energy_multiplier = 0.12
+		mi.material_override = m
+	for c in n.get_children():
+		_tint_meshes(c, lit)
 
 func _xbox(size: Vector3, pos: Vector3, mat: Material) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()

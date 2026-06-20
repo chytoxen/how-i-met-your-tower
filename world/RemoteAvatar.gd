@@ -5,7 +5,6 @@ extends Node3D
 ## floating callsign. Transform is fed by CrewManager from the owner's RPCs and
 ## smoothed here. (18 character variants → crew + passengers look varied.)
 
-const CHARS := "abcdefghijklmnopqr"
 const SCALE := 0.78
 
 var _target_pos: Vector3
@@ -15,32 +14,14 @@ var _ap: AnimationPlayer
 var _prev_pos := Vector3.ZERO
 var _speed := 0.0
 
-## Build a Kenney character (matte, animated). `anim` is the looping anim to play
-## (idle / walk / sit). Used by crew avatars AND cabin passengers.
-static func spawn_char(variant_seed: int, anim: String) -> Node3D:
-	var which := CHARS[absi(variant_seed) % CHARS.length()]
-	var model: Node3D = (load("res://assets/models/kenney_chars/character-%s.glb" % which) as PackedScene).instantiate()
-	model.rotation.y = PI                       # Kenney chars face +Z; turn to game forward (-Z)
-	var ap := _find_anim(model)
-	if ap != null and ap.has_animation(anim):
-		ap.get_animation(anim).loop_mode = Animation.LOOP_LINEAR
-		ap.play(anim)
-	return model
-
-static func _find_anim(n: Node) -> AnimationPlayer:
-	if n is AnimationPlayer:
-		return n
-	for c in n.get_children():
-		var r := _find_anim(c)
-		if r != null:
-			return r
-	return null
-
-func setup(callsign: String, color: Color) -> void:
-	var model := spawn_char(hash(callsign), "idle")
+func setup(callsign: String, color: Color, character := "") -> void:
+	if character == "":
+		character = Characters.funny_for(hash(callsign))
+	var model := Characters.make(character, "idle")
+	model.rotation.y = PI                        # Kenney chars face +Z; turn to game forward (-Z)
 	model.scale = Vector3(SCALE, SCALE, SCALE)
 	add_child(model)
-	_ap = _find_anim(model)
+	_ap = Characters.find_anim(model)
 
 	var tag := Label3D.new()
 	tag.text = callsign

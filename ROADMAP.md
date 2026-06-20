@@ -1,6 +1,14 @@
 # Roadmap
 
-Status as of **v0.10.0**.
+Status as of **v0.11.0**.
+
+## v0.11.0 — buildings + character customization
+- [x] **Real city skyline**: the exterior boxes are now Kenney **City Kit** buildings (detail buildings +
+      skyscrapers), tinted to a cohesive dusk palette with ~40% warm-lit from within.
+- [x] **Curated characters**: passengers = "normal folks" pool; players = "funny" pool
+      (mascot / robots / monster / geisha / caveman / ninja).
+- [x] **Character customization**: a new CUSTOMIZE screen with a live rotating 3D preview — cycle your
+      funny character + set your callsign. Choice is saved and sent to other players (shows on your avatar).
 
 ## v0.10.0 — real characters (cohesive CC0 art pass begins)
 - [x] Crew + passengers are now **real animated Kenney "Blocky Characters"** (CC0) instead of my

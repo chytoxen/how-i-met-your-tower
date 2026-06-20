@@ -540,10 +540,11 @@ func _seat(pos: Vector3, passenger := false) -> void:
 	_mesh_box(Vector3(0.06, 0.36, 0.40), pos + Vector3(0.24, 0.55, 0), fab.darkened(0.15))
 	if not passenger:
 		return
-	# A real seated Kenney character (animated "sit"), varied per seat.
+	# A real seated NORMAL Kenney character (animated "sit"), varied per seat.
 	var idx := int(absf(pos.x * 7.0 + pos.z * 13.0))
-	var pax := RemoteAvatar.spawn_char(idx, "sit")
+	var pax := Characters.make(Characters.normal_for(idx), "sit")
 	pax.name = "pax"
+	pax.rotation.y = PI
 	pax.scale = Vector3(0.62, 0.62, 0.62)
 	pax.position = pos + Vector3(0, 0.05, 0.12)
 	add_child(pax)

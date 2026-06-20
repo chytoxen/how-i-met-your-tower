@@ -62,7 +62,8 @@ func local_id() -> int:
 	return multiplayer.get_unique_id()
 
 func _self_info() -> Dictionary:
-	return {"callsign": GameState.profile["callsign"], "color": GameState.profile["suit_color"], "ready": false}
+	return {"callsign": GameState.profile["callsign"], "color": GameState.profile["suit_color"],
+		"character": GameState.profile.get("character", "r"), "ready": false}
 
 # --- connection callbacks ----------------------------------------------------
 

@@ -52,7 +52,7 @@ func _spawn_remote(id: int, pos: Vector3) -> void:
 	av.position = pos
 	add_child(av)
 	var info: Dictionary = Net.players.get(id, {})
-	av.setup(info.get("callsign", "Crew"), info.get("color", Color.WHITE))
+	av.setup(info.get("callsign", "Crew"), info.get("color", Color.WHITE), info.get("character", ""))
 	avatars[id] = av
 
 func _on_roster() -> void:

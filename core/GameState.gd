@@ -8,11 +8,17 @@ const PROFILE_PATH := "user://profile.cfg"
 
 var profile := {
 	"callsign": "Maverick",                 # gamertag shown to other players
-	"suit_color": Color(0.85, 0.2, 0.2),    # crew jumpsuit primary
-	"trim_color": Color(0.95, 0.85, 0.2),   # hi-vis trim
-	"skin_tone": 2,                         # index into a palette (Phase 2)
-	"hat": 0,                               # 0 none, 1 cap, 2 headset (Phase 2)
+	"character": "r",                       # Kenney funny-character id (a..r); see Characters.FUNNY
+	"suit_color": Color(0.85, 0.2, 0.2),    # accent (callsign tag tint)
+	"trim_color": Color(0.95, 0.85, 0.2),
+	"skin_tone": 2,
+	"hat": 0,
 }
+
+func set_character(id: String) -> void:
+	profile.character = id
+	profile_changed.emit()
+	save_profile()
 
 var session_seed := 0          # reshuffled each launch
 var pending_scenario := {}     # host fills this before starting a match

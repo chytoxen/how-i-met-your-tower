@@ -11,7 +11,7 @@ extends Node
 
 signal update_available(version: String, url: String, notes: String)
 
-const CURRENT_VERSION := "0.10.0"
+const CURRENT_VERSION := "0.11.0"
 const MANIFEST_URL := "https://raw.githubusercontent.com/chytoxen/how-i-met-your-tower/main/version.json"
 
 var has_update := false

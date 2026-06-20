@@ -106,46 +106,7 @@ func _on_quit() -> void:
 	get_tree().quit()
 
 func _on_customize() -> void:
-	var dlg := AcceptDialog.new()
-	dlg.title = "Customize Crew Member"
-
-	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 10)
-
-	var name_edit := LineEdit.new()
-	name_edit.text = GameState.profile["callsign"]
-	name_edit.placeholder_text = "Callsign / gamertag"
-	name_edit.max_length = 16
-	vb.add_child(_labeled("Callsign", name_edit))
-
-	var suit := ColorPickerButton.new()
-	suit.color = GameState.profile["suit_color"]
-	suit.custom_minimum_size = Vector2(120, 32)
-	vb.add_child(_labeled("Suit color", suit))
-
-	var trim := ColorPickerButton.new()
-	trim.color = GameState.profile["trim_color"]
-	trim.custom_minimum_size = Vector2(120, 32)
-	vb.add_child(_labeled("Trim color", trim))
-
-	dlg.add_child(vb)
-	dlg.confirmed.connect(func() -> void:
-		GameState.set_callsign(name_edit.text)
-		GameState.profile["suit_color"] = suit.color
-		GameState.profile["trim_color"] = trim.color
-		GameState.save_profile())
-	add_child(dlg)
-	dlg.popup_centered(Vector2i(380, 240))
-
-func _labeled(text: String, control: Control) -> HBoxContainer:
-	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 12)
-	var l := Label.new()
-	l.text = text
-	l.custom_minimum_size = Vector2(110, 0)
-	h.add_child(l)
-	h.add_child(control)
-	return h
+	GameState.goto_scene("res://ui/CustomizeMenu.tscn")
 
 func _play_menu_music() -> void:
 	var path := _first_audio("res://assets/audio/music")

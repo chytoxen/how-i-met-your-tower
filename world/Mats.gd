@@ -18,7 +18,7 @@ static func textured(tex: String, uv_scale := 1.0, metallic := 0.0, tint := Colo
 	if ResourceLoader.exists(base + "_normal.jpg"):
 		m.normal_enabled = true
 		m.normal_texture = load(base + "_normal.jpg")
-		m.normal_scale = 0.8
+		m.normal_scale = 0.45   # gentle — keep surfaces clean to match the flat Kenney models
 	m.albedo_color = tint
 	m.metallic = metallic
 	m.metallic_specular = 0.5

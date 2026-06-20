@@ -57,20 +57,38 @@ func _process(_delta: float) -> void:
 	if not _enabled or not Net.active or _capture == null:
 		return
 	var walkie := Input.is_action_pressed("walkie_talkie")
-	var talking := Input.is_action_pressed("push_to_talk") or walkie
-	if not talking:
+	# Proximity voice: PUSH-TO-TALK (hold the key) or OPEN MIC (always on, gated by
+	# a voice-activation threshold so we don't broadcast silence/room noise).
+	var open_mic: bool = Settings.voice.get("mode", "ptt") == "open"
+	var proximity := open_mic or Input.is_action_pressed("push_to_talk")
+	if not (proximity or walkie):
 		_capture.clear_buffer()
 		return
 	var frames := _capture.get_frames_available()
 	if frames <= 0:
 		return
-	var bytes := _pack(_capture.get_buffer(frames))
+	var buf := _capture.get_buffer(frames)
+	# Open-mic voice activation: skip frames quieter than the sensitivity gate
+	# (walkie + held PTT always send).
+	if open_mic and not walkie and not Input.is_action_pressed("push_to_talk"):
+		if _rms(buf) < float(Settings.voice.get("sensitivity", 0.04)):
+			return
+	var bytes := _pack(buf)
 	if bytes.size() == 0:
 		return
 	if Net.is_host:
 		_voice_play.rpc(Net.local_id(), bytes, 1 if walkie else 0)
 	else:
 		_voice_relay.rpc_id(1, bytes, 1 if walkie else 0)
+
+func _rms(buf: PackedVector2Array) -> float:
+	if buf.size() == 0:
+		return 0.0
+	var sum := 0.0
+	for f in buf:
+		var m := (f.x + f.y) * 0.5
+		sum += m * m
+	return sqrt(sum / float(buf.size()))
 
 @rpc("any_peer", "unreliable")
 func _voice_relay(bytes: PackedByteArray, channel: int) -> void:

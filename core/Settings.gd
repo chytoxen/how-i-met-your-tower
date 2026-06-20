@@ -33,6 +33,9 @@ var video := {
 	"shadow_quality": 2,  # 0=off 1=low 2=medium 3=high
 }
 var binds := {}          # action -> physical keycode
+## Voice chat: "ptt" (hold the talk key) or "open" (open mic, voice-activated).
+## sensitivity = RMS gate for open mic (lower = picks up quieter speech).
+var voice := {"mode": "ptt", "sensitivity": 0.04}
 
 func _ready() -> void:
 	_ensure_buses()
@@ -101,6 +104,10 @@ func set_bind(action: String, keycode: int) -> void:
 	apply_binds()
 	save_settings()
 
+func set_voice(key: String, value) -> void:
+	voice[key] = value
+	save_settings()
+
 # --- persistence -------------------------------------------------------------
 
 func save_settings() -> void:
@@ -111,6 +118,8 @@ func save_settings() -> void:
 		cfg.set_value("video", k, video[k])
 	for a in binds:
 		cfg.set_value("binds", a, binds[a])
+	for k in voice:
+		cfg.set_value("voice", k, voice[k])
 	cfg.save(SETTINGS_PATH)
 
 func load_settings() -> void:
@@ -123,3 +132,5 @@ func load_settings() -> void:
 		video[k] = cfg.get_value("video", k, video[k])
 	for a in DEFAULT_BINDS.keys():
 		binds[a] = cfg.get_value("binds", a, DEFAULT_BINDS[a])
+	for k in voice.keys():
+		voice[k] = cfg.get_value("voice", k, voice[k])

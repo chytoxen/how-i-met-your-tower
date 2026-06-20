@@ -68,6 +68,7 @@ func _build_ui() -> void:
 	center.add_child(_menu_button("PLAY (SOLO)", _on_play))
 	center.add_child(_menu_button("MULTIPLAYER", _on_multiplayer))
 	center.add_child(_menu_button("CUSTOMIZE", _on_customize))
+	center.add_child(_menu_button("HOW TO PLAY", _on_help))
 	center.add_child(_menu_button("SETTINGS", _on_settings))
 	center.add_child(_menu_button("QUIT", _on_quit))
 
@@ -107,6 +108,9 @@ func _on_quit() -> void:
 
 func _on_customize() -> void:
 	GameState.goto_scene("res://ui/CustomizeMenu.tscn")
+
+func _on_help() -> void:
+	GameState.goto_scene("res://ui/HelpMenu.tscn")
 
 func _play_menu_music() -> void:
 	var path := _first_audio("res://assets/audio/music")

@@ -52,7 +52,32 @@ func _audio_tab() -> Control:
 		s.custom_minimum_size = Vector2(260, 0)
 		s.value_changed.connect(func(val: float) -> void: Settings.set_volume(bus, val))
 		v.add_child(_row(bus, s))
+
+	# --- Voice chat ---
+	v.add_child(_section("Voice chat"))
+	var vm := OptionButton.new()
+	vm.add_item("Push-to-talk (hold V)")   # index 0 -> "ptt"
+	vm.add_item("Open mic (voice activated)")  # index 1 -> "open"
+	vm.selected = 1 if Settings.voice.get("mode", "ptt") == "open" else 0
+	vm.item_selected.connect(func(i: int) -> void: Settings.set_voice("mode", "open" if i == 1 else "ptt"))
+	v.add_child(_row("Voice mode", vm))
+
+	var sens := HSlider.new()
+	sens.min_value = 0.005
+	sens.max_value = 0.15
+	sens.step = 0.005
+	sens.value = Settings.voice.get("sensitivity", 0.04)
+	sens.custom_minimum_size = Vector2(260, 0)
+	sens.value_changed.connect(func(val: float) -> void: Settings.set_voice("sensitivity", val))
+	v.add_child(_row("Open-mic sensitivity", sens))
 	return v
+
+func _section(text: String) -> Label:
+	var l := Label.new()
+	l.text = "— %s —" % text
+	l.add_theme_font_size_override("font_size", 18)
+	l.modulate = Color(0.6, 0.75, 0.9)
+	return l
 
 func _graphics_tab() -> Control:
 	var v := VBoxContainer.new()

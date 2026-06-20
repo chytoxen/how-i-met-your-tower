@@ -1,6 +1,16 @@
 # Roadmap
 
-Status as of **v0.13.0**.
+Status as of **v0.14.0**.
+
+## v0.14.0 — voice modes + in-game help + texture cohesion
+- [x] **Two voice-chat modes**: Push-to-talk (hold the key) or **Open mic** (voice-activated, with a
+      sensitivity gate). Switch in Settings > Audio. Walkie-talkie is always push-to-talk.
+- [x] **HOW TO PLAY** screen in the main menu — detailed objective, controls (pulled live from your
+      current keybinds), solo/co-op setup, the flight loop, and tips. Replaced the on-screen control
+      hint text with this (kept only the one state-critical lobby cue).
+- [x] **Texture cohesion pass**: fixed the gate carpet's warm-red cast → cool in-palette blue-grey
+      (matches the cabin), and flattened the surface normals so textures read cleanly with the flat
+      Kenney models.
 
 ## v0.13.0 — first-person body + scale pass + real audio
 - [x] **First-person body**: you now see your own (chosen) character's torso/arms/legs when you look

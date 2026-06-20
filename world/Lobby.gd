@@ -160,7 +160,7 @@ func _build_terminal() -> void:
 			_column(Vector3(x, 0, z))
 
 	# Gate-area carpet — cohesive teal-grey
-	_mat_box(Vector3(38, 0.06, 16), Vector3(0, 0.04, -4), Mats.textured("carpet", 6.0, 0.0, Color(0.28, 0.40, 0.44)))
+	_mat_box(Vector3(38, 0.06, 16), Vector3(0, 0.04, -4), Mats.textured("carpet", 6.0, 0.0, Color(0.18, 0.27, 0.34)))
 
 	# Lounge seating clusters — real Kenney furniture around coffee tables.
 	for cx in [-15, -7.5, 6.5, 13.5]:
@@ -461,13 +461,15 @@ func _spawn_player_legacy() -> void:
 
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
+	# Full controls live in the main menu's HOW TO PLAY screen; in-world we show
+	# only the one non-obvious, state-critical cue (and a quiet Help pointer).
 	var hint := Label.new()
 	if Net.active:
-		hint.text = "Cursor is FREE — click READY UP, then the host clicks START FLIGHT · ESC: toggle cursor (free to click / locked to mouse-look) · WASD move · F1 menu"
+		hint.text = "Cursor is FREE — click READY UP, then the host clicks START FLIGHT.  ESC toggles cursor ⇄ mouse-look."
 	else:
-		hint.text = "WASD move · Shift sprint · Space jump · Mouse look · [E] interact · Board the glowing DEPARTURES desk to fly · ESC cursor · F1 menu"
+		hint.text = "Board the glowing DEPARTURES desk to fly.  (Controls: main menu → HOW TO PLAY)"
 	hint.position = Vector2(16, 16)
-	hint.modulate = Color(1, 1, 1, 0.7)
+	hint.modulate = Color(1, 1, 1, 0.55)
 	layer.add_child(hint)
 	add_child(layer)
 

@@ -1,5 +1,5 @@
 {
-  "version": "0.13.0",
+  "version": "0.14.0",
   "url": "https://github.com/chytoxen/how-i-met-your-tower/releases/latest",
-  "notes": "v0.13.0 — you can now see your own body in first person (look down), everything is scaled to consistent human proportions, and real audio is in: tense flight ambience, a calm menu theme, a repair chime, and an authentic plane master-warning alarm."
+  "notes": "v0.14.0 — two voice-chat modes (push-to-talk or open mic, switch in Settings), a full HOW TO PLAY screen in the menu (replacing the on-screen hints), and a texture-cohesion pass."
 }
